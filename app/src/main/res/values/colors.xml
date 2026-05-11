@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary brand colour (deep purple) -->
+    <color name="colorPrimary">#FF6200EE</color>
+    <color name="colorPrimaryVariant">#FF3700B3</color>
+    <color name="colorOnPrimary">#FFFFFFFF</color>
+
+    <!-- Secondary (teal) -->
+    <color name="colorSecondary">#FF018786</color>
+    <color name="colorSecondaryVariant">#FF018786</color>
+    <color name="colorOnSecondary">#FFFFFFFF</color>
+
+    <!-- Surface / background -->
+    <color name="background">#FFF5F5F5</color>
+    <color name="colorSurface">#FFFFFFFF</color>
+    <color name="colorOnSurface">#FF212121</color>
+
+    <!-- Divider -->
+    <color name="colorDivider">#FFE0E0E0</color>
+
+    <!-- Status bar -->
+    <color name="colorStatusBar">#FF3700B3</color>
+</resources>

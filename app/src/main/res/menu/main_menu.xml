@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    main_menu.xml
+    Toolbar overflow menu items for the main navigation screen.
+-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Opens the system file picker to select a GPX file -->
+    <item
+        android:id="@+id/action_load_gpx"
+        android:title="@string/menu_load_gpx"
+        app:showAsAction="never" />
+
+    <!-- Toggles track recording on/off -->
+    <item
+        android:id="@+id/action_toggle_record"
+        android:title="@string/menu_toggle_record"
+        app:showAsAction="never" />
+
+</menu>

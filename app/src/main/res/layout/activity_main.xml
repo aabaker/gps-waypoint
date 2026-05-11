@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_main.xml
+    Main navigation screen layout.
+
+    Sections (top to bottom):
+      1. MaterialToolbar  – app title + menu (Load GPX, Record)
+      2. DirectionArrowView – large rotatable arrow
+      3. Waypoint info panel – name, distance, bearing
+      4. Stats row – elapsed distance, heart rate
+      5. Waypoint counter + Prev/Next buttons
+      6. Record toggle button
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".ui.MainActivity">
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:titleTextColor="@color/colorOnPrimary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:title="@string/app_name" />
+
+    <!-- Direction arrow -->
+    <com.example.gpswaypoint.ui.DirectionArrowView
+        android:id="@+id/arrowView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="48dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintBottom_toTopOf="@id/tvWaypointName"
+        app:layout_constraintVertical_weight="3" />
+
+    <!-- Waypoint name -->
+    <TextView
+        android:id="@+id/tvWaypointName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorOnSurface"
+        android:ellipsize="end"
+        android:maxLines="1"
+        app:layout_constraintTop_toBottomOf="@id/arrowView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="Waypoint Name" />
+
+    <!-- Distance to target -->
+    <TextView
+        android:id="@+id/tvDistance"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/tvWaypointName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="342 m" />
+
+    <!-- Bearing -->
+    <TextView
+        android:id="@+id/tvBearing"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="@color/colorSecondary"
+        app:layout_constraintTop_toBottomOf="@id/tvDistance"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="045° NE" />
+
+    <!-- Stats row: elapsed distance | heart rate -->
+    <LinearLayout
+        android:id="@+id/statsRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/tvBearing"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_elapsed"
+                android:textSize="11sp"
+                android:textColor="@color/colorSecondary"
+                android:textAllCaps="true" />
+
+            <TextView
+                android:id="@+id/tvElapsed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorOnSurface"
+                tools:text="1.4 km" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/colorDivider" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_heart_rate"
+                android:textSize="11sp"
+                android:textColor="@color/colorSecondary"
+                android:textAllCaps="true" />
+
+            <TextView
+                android:id="@+id/tvHeartRate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/colorOnSurface"
+                tools:text="72 bpm" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Waypoint navigation row: [PREV]  3/12  [NEXT] -->
+    <LinearLayout
+        android:id="@+id/waypointNavRow"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/statsRow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/btnPrevWaypoint"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_prev"
+            android:minWidth="80dp" />
+
+        <TextView
+            android:id="@+id/tvWaypointCounter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textColor="@color/colorOnSurface"
+            tools:text="3 / 12" />
+
+        <Button
+            android:id="@+id/btnNextWaypoint"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_next"
+            android:minWidth="80dp" />
+    </LinearLayout>
+
+    <!-- Record toggle button -->
+    <Button
+        android:id="@+id/btnRecord"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/start_recording"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

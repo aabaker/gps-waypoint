@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GPS Waypoint Navigator</string>
+
+    <!-- Navigation UI -->
+    <string name="no_route_loaded">No route loaded — tap ⋮ → Load GPX</string>
+    <string name="elapsed_prefix">Elapsed:</string>
+    <string name="label_elapsed">Elapsed</string>
+    <string name="label_heart_rate">Heart Rate</string>
+    <string name="hr_not_connected">– bpm</string>
+
+    <!-- Buttons -->
+    <string name="btn_prev">◀ Prev</string>
+    <string name="btn_next">Next ▶</string>
+    <string name="start_recording">⏺ Start Recording</string>
+    <string name="stop_recording">⏹ Stop Recording</string>
+
+    <!-- Menu items -->
+    <string name="menu_load_gpx">Load GPX…</string>
+    <string name="menu_toggle_record">Toggle Record</string>
+</resources>

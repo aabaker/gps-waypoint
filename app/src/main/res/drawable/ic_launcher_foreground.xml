@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    ic_launcher_foreground.xml
+    Adaptive icon foreground layer — large navigation arrow centred on a
+    transparent background.  The system applies the shape mask.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <path
+        android:fillColor="#FF6200EE"
+        android:pathData="M54,18L33,81L35.5,83L54,72L72.5,83L75,81Z" />
+
+</vector>
