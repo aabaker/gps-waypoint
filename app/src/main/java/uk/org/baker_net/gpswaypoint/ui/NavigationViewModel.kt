@@ -1,4 +1,4 @@
-package com.example.gpswaypoint.ui
+package uk.org.baker_net.gpswaypoint.ui
 
 import android.app.Application
 import android.net.Uri
@@ -6,11 +6,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.gpswaypoint.model.NavigationState
-import com.example.gpswaypoint.model.Waypoint
-import com.example.gpswaypoint.service.NavigationService
-import com.example.gpswaypoint.util.GeoUtils
-import com.example.gpswaypoint.util.GpxParser
+import uk.org.baker_net.gpswaypoint.model.NavigationState
+import uk.org.baker_net.gpswaypoint.model.Waypoint
+import uk.org.baker_net.gpswaypoint.service.NavigationService
+import uk.org.baker_net.gpswaypoint.util.GeoUtils
+import uk.org.baker_net.gpswaypoint.util.GpxParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

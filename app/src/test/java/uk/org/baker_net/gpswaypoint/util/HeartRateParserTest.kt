@@ -1,6 +1,6 @@
-package com.example.gpswaypoint.util
+package uk.org.baker_net.gpswaypoint.util
 
-import com.example.gpswaypoint.ble.HeartRateManager
+import uk.org.baker_net.gpswaypoint.ble.HeartRateManager
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test

@@ -1,4 +1,4 @@
-package com.example.gpswaypoint.service
+package uk.org.baker_net.gpswaypoint.service
 
 import android.app.*
 import android.content.Context
@@ -11,13 +11,13 @@ import android.location.*
 import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.example.gpswaypoint.R
-import com.example.gpswaypoint.ble.HeartRateManager
-import com.example.gpswaypoint.model.TrackPoint
-import com.example.gpswaypoint.model.Waypoint
-import com.example.gpswaypoint.ui.MainActivity
-import com.example.gpswaypoint.util.GeoUtils
-import com.example.gpswaypoint.util.TcxWriter
+import uk.org.baker_net.gpswaypoint.R
+import uk.org.baker_net.gpswaypoint.ble.HeartRateManager
+import uk.org.baker_net.gpswaypoint.model.TrackPoint
+import uk.org.baker_net.gpswaypoint.model.Waypoint
+import uk.org.baker_net.gpswaypoint.ui.MainActivity
+import uk.org.baker_net.gpswaypoint.util.GeoUtils
+import uk.org.baker_net.gpswaypoint.util.TcxWriter
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -57,7 +57,7 @@ class NavigationService : Service() {
         private const val RECORD_MIN_DISTANCE_M = 5.0
 
         /** Intent action used to bring MainActivity to front from the notification. */
-        const val ACTION_NAVIGATE = "com.example.gpswaypoint.NAVIGATE"
+        const val ACTION_NAVIGATE = "uk.org.baker_net.gpswaypoint.NAVIGATE"
     }
 
     // -------------------------------------------------------------------------

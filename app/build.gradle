@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.gpswaypoint'
+    namespace 'uk.org.baker_net.gpswaypoint'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.gpswaypoint"
+        applicationId "uk.org.baker_net.gpswaypoint"
         minSdk 26
         targetSdk 34
         versionCode 1

@@ -1,4 +1,4 @@
-package com.example.gpswaypoint.util
+package uk.org.baker_net.gpswaypoint.util
 
 import org.junit.Assert.*
 import org.junit.Test

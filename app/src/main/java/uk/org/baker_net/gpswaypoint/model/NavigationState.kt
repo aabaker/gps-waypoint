@@ -1,4 +1,4 @@
-package com.example.gpswaypoint.model
+package uk.org.baker_net.gpswaypoint.model
 
 /**
  * NavigationState.kt

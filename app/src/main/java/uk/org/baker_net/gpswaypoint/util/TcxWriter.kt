@@ -1,6 +1,6 @@
-package com.example.gpswaypoint.util
+package uk.org.baker_net.gpswaypoint.util
 
-import com.example.gpswaypoint.model.TrackPoint
+import uk.org.baker_net.gpswaypoint.model.TrackPoint
 import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*

@@ -1,4 +1,4 @@
-package com.example.gpswaypoint.ui
+package uk.org.baker_net.gpswaypoint.ui
 
 import android.content.Context
 import android.graphics.*

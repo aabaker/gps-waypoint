@@ -1,4 +1,4 @@
-package com.example.gpswaypoint.ble
+package uk.org.baker_net.gpswaypoint.ble
 
 import android.Manifest
 import android.bluetooth.*

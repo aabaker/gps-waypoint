@@ -25,7 +25,7 @@ prompt is shown at the end of this README.
 | **Compass arrow** | Rotates in real-time to point toward the target waypoint |
 | **Waypoint buttons** | Prev / Next buttons plus waypoint counter (3/12) |
 | **BLE heart rate** | Auto-scans for any BLE Heart Rate Service (0x180D) peripheral |
-| **TCX recording** | Records path + HR to `Android/data/com.example.gpswaypoint/files/recordings/` |
+| **TCX recording** | Records path + HR to `Android/data/uk.org.baker_net.gpswaypoint/files/recordings/` |
 | **Foreground service** | Navigation and recording continue when the screen is off |
 | **Clean shutdown** | Finishes immediately if location permission is denied |
 
@@ -34,7 +34,7 @@ prompt is shown at the end of this README.
 ## Project structure
 
 ```
-app/src/main/java/com/example/gpswaypoint/
+app/src/main/java/uk/org/baker_net/gpswaypoint/
 ├── model/
 │   ├── Waypoint.kt          – GPX waypoint data class
 │   ├── TrackPoint.kt        – Recorded position sample
@@ -116,7 +116,7 @@ Recordings are saved to the app-specific external directory — no runtime
 permission is needed to write there:
 
 ```
-/sdcard/Android/data/com.example.gpswaypoint/files/recordings/activity_YYYYMMDD_HHmmss.tcx
+/sdcard/Android/data/uk.org.baker_net.gpswaypoint/files/recordings/activity_YYYYMMDD_HHmmss.tcx
 ```
 
 Files survive app updates but are removed if the app is uninstalled.

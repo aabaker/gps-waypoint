@@ -33,7 +33,7 @@
         app:title="@string/app_name" />
 
     <!-- Direction arrow -->
-    <com.example.gpswaypoint.ui.DirectionArrowView
+    <uk.org.baker_net.gpswaypoint.ui.DirectionArrowView
         android:id="@+id/arrowView"
         android:layout_width="0dp"
         android:layout_height="0dp"

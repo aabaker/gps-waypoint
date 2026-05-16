@@ -1,7 +1,7 @@
-package com.example.gpswaypoint.util
+package uk.org.baker_net.gpswaypoint.util
 
 import android.util.Xml
-import com.example.gpswaypoint.model.Waypoint
+import uk.org.baker_net.gpswaypoint.model.Waypoint
 import org.xmlpull.v1.XmlPullParser
 import java.io.InputStream
 

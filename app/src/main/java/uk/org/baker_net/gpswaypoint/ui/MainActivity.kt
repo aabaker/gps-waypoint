@@ -1,4 +1,4 @@
-package com.example.gpswaypoint.ui
+package uk.org.baker_net.gpswaypoint.ui
 
 import android.Manifest
 import android.content.*
@@ -13,11 +13,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.gpswaypoint.R
-import com.example.gpswaypoint.databinding.ActivityMainBinding
-import com.example.gpswaypoint.model.NavigationState
-import com.example.gpswaypoint.service.NavigationService
-import com.example.gpswaypoint.util.GeoUtils
+import uk.org.baker_net.gpswaypoint.R
+import uk.org.baker_net.gpswaypoint.databinding.ActivityMainBinding
+import uk.org.baker_net.gpswaypoint.model.NavigationState
+import uk.org.baker_net.gpswaypoint.service.NavigationService
+import uk.org.baker_net.gpswaypoint.util.GeoUtils
 
 /**
  * MainActivity.kt
