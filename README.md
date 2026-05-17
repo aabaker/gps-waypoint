@@ -145,6 +145,17 @@ API 26 (Android 8.0 Oreo).  The `FOREGROUND_SERVICE_LOCATION` permission and
 `android:foregroundServiceType="location"` are required on API 29+ and declared
 unconditionally so the manifest is forward-compatible.
 
+## Security Considerations
+
+Potential untrusted input to the application is from the supplied GPX waypoint file and sensor data.
+
+GPX parsing is performed using the Android XmlPullParser, the application inherits any security vulnerabilities
+present in that library. A malicious GPX file could exhaust memory with an excesive number of waypoints or
+excessively long waypoint name. As the GPX file is user selected and no long term corruption is possible this risk
+is accepted.
+
+The Android framework is expected to filter out invalid sensor data.
+
 ## Claude Prompt
 
 Write an android app to display the distance and direction to a waypoint.
