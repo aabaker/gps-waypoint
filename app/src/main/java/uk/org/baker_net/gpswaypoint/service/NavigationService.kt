@@ -132,8 +132,8 @@ class NavigationService : Service() {
     override fun onCreate() {
         super.onCreate()
         Log.d(TAG, "Service created")
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, buildNotification("Initialising…"))
         startCompass()
@@ -467,7 +467,7 @@ class NavigationService : Service() {
         ).apply {
             description = "GPS navigation status"
         }
-        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         nm.createNotificationChannel(channel)
     }
 
@@ -510,7 +510,7 @@ class NavigationService : Service() {
             loc.latitude, loc.longitude, target.latitude, target.longitude
         )
         val text = "→ ${target.name}  ${GeoUtils.formatDistance(dist.toFloat())}"
-        val nm = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         nm.notify(NOTIFICATION_ID, buildNotification(text))
     }
 }

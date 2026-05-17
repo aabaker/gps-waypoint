@@ -231,7 +231,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun bindNavigationService() {
         val intent = Intent(this, NavigationService::class.java)
-        bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+        bindService(intent, serviceConnection, BIND_AUTO_CREATE)
     }
 
     // -------------------------------------------------------------------------
@@ -302,7 +302,7 @@ class MainActivity : AppCompatActivity() {
                 binding.arrowView.hasValidFix       = true
 
                 // Update record button label
-                binding.btnRecord?.apply {
+                binding.btnRecord.apply {
                     text = if (state.isRecording)
                         getString(R.string.stop_recording)
                     else
