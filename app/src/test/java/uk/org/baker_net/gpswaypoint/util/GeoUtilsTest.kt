@@ -45,8 +45,9 @@ class GeoUtilsTest {
     fun haversineDistance_londonToParis_approx341km() {
         // London: 51.5074° N, 0.1278° W
         // Paris:  48.8566° N, 2.3522° E
+        // expected value calculated using https://www.cqsrg.org/tools/GCDistance/
         val d = GeoUtils.haversineDistance(51.5074, -0.1278, 48.8566, 2.3522)
-        val expected = 341_000.0  // metres
+        val expected = 343_923.0  // metres
         val tolerance = expected * DISTANCE_TOLERANCE_RATIO
         assertTrue(
             "Expected ~341 km but got ${d / 1000} km",
