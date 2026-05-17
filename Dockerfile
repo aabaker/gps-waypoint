@@ -10,7 +10,7 @@
 # The resulting APK will appear in:
 #   app/build/outputs/apk/debug/app-debug.apk
 
-FROM budtmo/docker-android-build-box:latest
+FROM mingc/android-build-box:latest
 
 # Set working directory inside the container to /app.
 # The host project directory is mounted here at docker run time.
