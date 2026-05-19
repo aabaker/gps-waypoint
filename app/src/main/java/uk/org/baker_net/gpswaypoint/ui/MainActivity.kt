@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
             val b = binder as NavigationService.NavigationBinder
             navigationService = b.getService()
             viewModel.service = navigationService
+            navigationService?.startGps()
             serviceBound = true
         }
         override fun onServiceDisconnected(name: ComponentName) {
@@ -83,7 +84,6 @@ class MainActivity : AppCompatActivity() {
             }
             // Permission granted – start the service and GPS
             startNavigationService()
-            navigationService?.startGps()
             // Also request BLE permissions now (non-fatal if denied)
             requestBluetoothPermissions()
         }
@@ -178,7 +178,7 @@ class MainActivity : AppCompatActivity() {
 
         if (fineGranted) {
             startNavigationService()
-            navigationService?.startGps()
+            requestBluetoothPermissions()
         } else {
             locationPermissionLauncher.launch(
                 arrayOf(
@@ -248,6 +248,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupClickListeners() {
         binding.btnPrevWaypoint.setOnClickListener { viewModel.previousWaypoint() }
         binding.btnNextWaypoint.setOnClickListener { viewModel.nextWaypoint()  }
+        binding.btnRecord.setOnClickListener { viewModel.toggleRecording() }
     }
 
     /**
