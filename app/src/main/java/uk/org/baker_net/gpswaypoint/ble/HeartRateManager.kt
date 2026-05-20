@@ -62,7 +62,7 @@ class HeartRateManager(
          * Called when the BLE peripheral connects or disconnects.
          * @param connected true if just connected, false if disconnected.
          */
-        fun onConnectionStateChanged(connected: Boolean)
+        fun onConnectionStateChanged(connected: Boolean, name: String)
     }
 
     private val bluetoothManager =
@@ -71,6 +71,7 @@ class HeartRateManager(
     private var bluetoothGatt: BluetoothGatt? = null
     private var scanner: BluetoothLeScanner? = null
     private var scanCallback: ScanCallback? = null
+    private var deviceName: String = ""
 
     // -------------------------------------------------------------------------
     // Scanning
@@ -112,6 +113,7 @@ class HeartRateManager(
         val cb = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
                 Log.d(TAG, "Found HR device: ${result.device.address}")
+                deviceName = result.device.name
                 stopScan()
                 connectToDevice(result.device)
             }
@@ -187,14 +189,14 @@ class HeartRateManager(
             when (newState) {
                 BluetoothProfile.STATE_CONNECTED -> {
                     Log.d(TAG, "GATT connected, starting service discovery")
-                    callback.onConnectionStateChanged(true)
+                    callback.onConnectionStateChanged(true, name = deviceName)
                     if (!hasBluetoothPermission()) return
                     @Suppress("MissingPermission")
                     gatt.discoverServices()
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {
                     Log.d(TAG, "GATT disconnected")
-                    callback.onConnectionStateChanged(false)
+                    callback.onConnectionStateChanged(false, name = "")
                 }
             }
         }

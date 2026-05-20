@@ -249,6 +249,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnPrevWaypoint.setOnClickListener { viewModel.previousWaypoint() }
         binding.btnNextWaypoint.setOnClickListener { viewModel.nextWaypoint()  }
         binding.btnRecord.setOnClickListener { viewModel.toggleRecording() }
+        binding.btnQuit.setOnClickListener { viewModel.quitApp() }
     }
 
     /**

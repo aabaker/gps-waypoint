@@ -441,7 +441,7 @@ class NavigationService : Service() {
                 lastHeartRate = bpm
                 onStateChanged?.invoke()
             }
-            override fun onConnectionStateChanged(connected: Boolean) {
+            override fun onConnectionStateChanged(connected: Boolean, name: String) {
                 Log.d(TAG, "HR monitor connected=$connected")
                 onStateChanged?.invoke()
             }

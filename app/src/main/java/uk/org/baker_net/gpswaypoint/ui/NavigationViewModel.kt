@@ -13,6 +13,7 @@ import uk.org.baker_net.gpswaypoint.util.GeoUtils
 import uk.org.baker_net.gpswaypoint.util.GpxParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.system.exitProcess
 
 /**
  * NavigationViewModel.kt
@@ -140,6 +141,18 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
             svc.startRecording()
         }
         refreshState()
+    }
+
+    /**
+     * Exits the application causing the navigation service to be destroyed which stops
+     * the GPS from continuing to use battery power
+     *
+     * Input: none
+     * Output: none
+     */
+    fun quitApp() {
+        // android.os.Process.killProcess(android.os.Process.myPid())
+        exitProcess(0)
     }
 
     // -------------------------------------------------------------------------

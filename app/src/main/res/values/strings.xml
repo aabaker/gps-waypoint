@@ -14,6 +14,7 @@
     <string name="btn_next">Next ▶</string>
     <string name="start_recording">⏺ Start Recording</string>
     <string name="stop_recording">⏹ Stop Recording</string>
+    <string name="quit">Quit App</string>
 
     <!-- Menu items -->
     <string name="menu_load_gpx">Load GPX…</string>
