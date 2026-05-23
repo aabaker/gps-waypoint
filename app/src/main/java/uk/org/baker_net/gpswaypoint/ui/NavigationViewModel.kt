@@ -91,6 +91,7 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
                     _toastMessage.postValue("No waypoints found in GPX file")
                     return@launch
                 }
+                service?.startNavigating()
                 service?.loadWaypoints(waypoints)
                 _toastMessage.postValue("Loaded ${waypoints.size} waypoints")
             } catch (e: Exception) {
@@ -138,21 +139,22 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
                 if (file != null) "Saved: ${file.name}" else "Save failed"
             )
         } else {
+            svc.startNavigating()
             svc.startRecording()
         }
         refreshState()
     }
 
     /**
-     * Exits the application causing the navigation service to be destroyed which stops
-     * the GPS from continuing to use battery power
+     * Stop navigation functions and hence battery usage
      *
      * Input: none
      * Output: none
      */
-    fun quitApp() {
-        // android.os.Process.killProcess(android.os.Process.myPid())
-        exitProcess(0)
+    fun stopNav() {
+        _navigationState.postValue(NavigationState.NoRoute)
+        val svc = service ?: return
+        svc.stopNavigating()
     }
 
     // -------------------------------------------------------------------------

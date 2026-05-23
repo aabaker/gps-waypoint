@@ -21,6 +21,10 @@ import uk.org.baker_net.gpswaypoint.util.TcxWriter
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
+import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
 /**
  * NavigationService.kt
@@ -55,6 +59,9 @@ class NavigationService : Service() {
 
         /** Recording interval: store a TrackPoint every N metres of movement. */
         private const val RECORD_MIN_DISTANCE_M = 5.0
+
+        /** Maximum time since last heart rate update before heart rate data is ignored. */
+        private val HR_MAX_AGE: Duration = 20.seconds
 
         /** Intent action used to bring MainActivity to front from the notification. */
         const val ACTION_NAVIGATE = "uk.org.baker_net.gpswaypoint.NAVIGATE"
@@ -93,9 +100,15 @@ class NavigationService : Service() {
     var deviceBearing: Float = 0f
         private set
 
+    /** The timer used to measure heartrate age */
+    val timer = TimeSource.Monotonic
+
     /** Most recent heart-rate reading in BPM (null = no monitor). */
     var lastHeartRate: Int? = null
         private set
+
+    /** When heart rate was last updated */
+    var lastHeartRateTime: TimeSource.Monotonic.ValueTimeMark = timer.markNow()
 
     /** Whether the track recorder is active. */
     var isRecording: Boolean = false
@@ -136,8 +149,6 @@ class NavigationService : Service() {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         createNotificationChannel()
         startForeground(NOTIFICATION_ID, buildNotification("Initialising…"))
-        startCompass()
-        startHeartRateMonitor()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -146,11 +157,22 @@ class NavigationService : Service() {
 
     override fun onDestroy() {
         Log.d(TAG, "Service destroyed")
+        stopNavigating()
+        super.onDestroy()
+    }
+
+    fun startNavigating() {
+        startGps()
+        startCompass()
+        startHeartRateMonitor()
+    }
+
+    fun stopNavigating() {
         stopGps()
         stopCompass()
         heartRateManager?.disconnect()
+        lastHeartRate = null
         if (isRecording) stopRecording()
-        super.onDestroy()
     }
 
     // -------------------------------------------------------------------------
@@ -180,6 +202,11 @@ class NavigationService : Service() {
 
             // Auto-advance waypoint if within arrival radius
             checkWaypointArrival(location)
+
+            // Check if heart rate data is stale
+            if (lastHeartRateTime < timer.markNow() - HR_MAX_AGE) {
+                lastHeartRate = null
+            }
 
             updateNotification()
             onStateChanged?.invoke()
@@ -439,6 +466,7 @@ class NavigationService : Service() {
         heartRateManager = HeartRateManager(this, object : HeartRateManager.HeartRateCallback {
             override fun onHeartRate(bpm: Int) {
                 lastHeartRate = bpm
+                lastHeartRateTime = timer.markNow()
                 onStateChanged?.invoke()
             }
             override fun onConnectionStateChanged(connected: Boolean, name: String) {

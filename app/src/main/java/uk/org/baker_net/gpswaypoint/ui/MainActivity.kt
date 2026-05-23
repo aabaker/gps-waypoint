@@ -52,7 +52,6 @@ class MainActivity : AppCompatActivity() {
             val b = binder as NavigationService.NavigationBinder
             navigationService = b.getService()
             viewModel.service = navigationService
-            navigationService?.startGps()
             serviceBound = true
         }
         override fun onServiceDisconnected(name: ComponentName) {
@@ -249,7 +248,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnPrevWaypoint.setOnClickListener { viewModel.previousWaypoint() }
         binding.btnNextWaypoint.setOnClickListener { viewModel.nextWaypoint()  }
         binding.btnRecord.setOnClickListener { viewModel.toggleRecording() }
-        binding.btnQuit.setOnClickListener { viewModel.quitApp() }
+        binding.btnStop.setOnClickListener { viewModel.stopNav() }
     }
 
     /**
@@ -279,7 +278,8 @@ class MainActivity : AppCompatActivity() {
                 binding.tvWaypointName.text    = getString(R.string.no_route_loaded)
                 binding.tvDistance.text        = "--"
                 binding.tvBearing.text         = "--"
-                binding.tvElapsed.text         = getString(R.string.elapsed_prefix) + " --"
+                binding.tvElapsed.text         = getString(R.string.elapsed_prefix) + " -- " +
+                        getString(R.string.remain_prefix) + " --"
                 binding.tvWaypointCounter.text = "- / -"
                 binding.tvHeartRate.text       = getString(R.string.hr_not_connected)
                 binding.arrowView.arrowRotationDeg = 0f
@@ -293,7 +293,9 @@ class MainActivity : AppCompatActivity() {
                 binding.tvBearing.text      = GeoUtils.formatBearing(state.bearingToTarget)
                 binding.tvElapsed.text      =
                     getString(R.string.elapsed_prefix) + " " +
-                    GeoUtils.formatDistance(state.elapsedDistanceM)
+                    GeoUtils.formatDistance(state.elapsedDistanceM) + " " +
+                            getString(R.string.remain_prefix) + " " +
+                            GeoUtils.formatDistance(state.distanceToTarget + state.currentWaypoint.distanceRemain)
                 binding.tvWaypointCounter.text =
                     "${state.currentIndex + 1} / ${state.waypoints.size}"
                 binding.tvHeartRate.text = state.heartRateBpm

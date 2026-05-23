@@ -3,7 +3,7 @@ package uk.org.baker_net.gpswaypoint.model
 /**
  * Waypoint.kt
  *
- * Immutable data class representing a single GPX waypoint.
+ * Data class representing a single GPX waypoint.
  *
  * @property name      Human-readable name parsed from the <name> element (may be empty).
  * @property latitude  WGS-84 latitude in decimal degrees.
@@ -14,5 +14,6 @@ data class Waypoint(
     val name: String,
     val latitude: Double,
     val longitude: Double,
-    val elevation: Double? = null
+    val elevation: Double? = null,
+    var distanceRemain: Float = 0.0f
 )

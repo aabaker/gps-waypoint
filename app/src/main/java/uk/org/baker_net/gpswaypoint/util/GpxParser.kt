@@ -102,6 +102,23 @@ object GpxParser {
             }
             eventType = parser.next()
         }
+        if (waypoints.isEmpty()) {
+            return waypoints
+        }
+        var prevLat: Double? = null
+        var prevLon: Double? = null
+        var totalDist = 0.0f
+        val wptIterator = waypoints.listIterator(waypoints.size)
+        while (wptIterator.hasPrevious()) {
+            val wpt = wptIterator.previous()
+            if ((prevLat != null) && (prevLon != null)) {
+                totalDist += GeoUtils.haversineDistance(prevLat, prevLon,
+                    wpt.latitude, wpt.longitude).toFloat()
+            }
+            wpt.distanceRemain = totalDist
+            prevLat = wpt.latitude
+            prevLon = wpt.longitude
+        }
         return waypoints
     }
 }

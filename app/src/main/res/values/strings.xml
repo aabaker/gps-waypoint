@@ -5,7 +5,8 @@
     <!-- Navigation UI -->
     <string name="no_route_loaded">No route loaded — tap ⋮ → Load GPX</string>
     <string name="elapsed_prefix">Elapsed:</string>
-    <string name="label_elapsed">Elapsed</string>
+    <string name="remain_prefix">To Go:</string>
+    <string name="label_distance">Distance</string>
     <string name="label_heart_rate">Heart Rate</string>
     <string name="hr_not_connected">– bpm</string>
 
@@ -14,7 +15,7 @@
     <string name="btn_next">Next ▶</string>
     <string name="start_recording">⏺ Start Recording</string>
     <string name="stop_recording">⏹ Stop Recording</string>
-    <string name="quit">Quit App</string>
+    <string name="stop_nav">Stop Navigating</string>
 
     <!-- Menu items -->
     <string name="menu_load_gpx">Load GPX…</string>
