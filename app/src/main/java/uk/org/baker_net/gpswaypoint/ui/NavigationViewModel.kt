@@ -13,7 +13,7 @@ import uk.org.baker_net.gpswaypoint.util.GeoUtils
 import uk.org.baker_net.gpswaypoint.util.GpxParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.system.exitProcess
+import uk.org.baker_net.gpswaypoint.model.RecordingState
 
 /**
  * NavigationViewModel.kt
@@ -50,6 +50,9 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
      * after consuming the event.
      */
     val toastMessage: LiveData<String?> = _toastMessage
+
+    private val _recordingState = MutableLiveData<RecordingState>()
+    val recordingState: LiveData<RecordingState> = _recordingState
 
     // -------------------------------------------------------------------------
     // Service reference
@@ -172,6 +175,12 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
         val svc = service
         val wps = svc?.waypoints ?: emptyList()
 
+        _recordingState.postValue(
+            RecordingState(
+                isRecording = svc?.isRecording ?: false
+            )
+        )
+
         if (wps.isEmpty()) {
             _navigationState.postValue(NavigationState.NoRoute)
             return
@@ -206,8 +215,7 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
                 deviceBearing     = svc.deviceBearing,
                 distanceToTarget  = distanceToTarget,
                 elapsedDistanceM  = svc.elapsedDistanceM,
-                heartRateBpm      = svc.lastHeartRate,
-                isRecording       = svc.isRecording
+                heartRateBpm      = svc.lastHeartRate
             )
         )
     }

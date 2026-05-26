@@ -31,8 +31,7 @@ sealed class NavigationState {
         val deviceBearing: Float,
         val distanceToTarget: Float,
         val elapsedDistanceM: Float,
-        val heartRateBpm: Int?,
-        val isRecording: Boolean
+        val heartRateBpm: Int?
     ) : NavigationState() {
         /** Convenience: the active waypoint. */
         val currentWaypoint: Waypoint get() = waypoints[currentIndex]

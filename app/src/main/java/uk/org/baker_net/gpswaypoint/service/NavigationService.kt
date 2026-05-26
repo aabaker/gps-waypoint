@@ -24,7 +24,6 @@ import java.util.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.TimeSource
-import kotlin.time.TimeSource.Monotonic.ValueTimeMark
 
 /**
  * NavigationService.kt
@@ -173,6 +172,8 @@ class NavigationService : Service() {
         heartRateManager?.disconnect()
         lastHeartRate = null
         if (isRecording) stopRecording()
+        waypoints = emptyList()
+        elapsedDistanceM = 0f
     }
 
     // -------------------------------------------------------------------------

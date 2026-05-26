@@ -264,6 +264,15 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
             }
         }
+        viewModel.recordingState.observe(this) { state ->
+            // Update record button label
+            binding.btnRecord.apply {
+                text = if (state.isRecording)
+                    getString(R.string.stop_recording)
+                else
+                    getString(R.string.start_recording)
+            }
+        }
     }
 
     /**
@@ -305,13 +314,6 @@ class MainActivity : AppCompatActivity() {
                 binding.arrowView.arrowRotationDeg = state.arrowRotation
                 binding.arrowView.hasValidFix       = true
 
-                // Update record button label
-                binding.btnRecord.apply {
-                    text = if (state.isRecording)
-                        getString(R.string.stop_recording)
-                    else
-                        getString(R.string.start_recording)
-                }
             }
         }
     }
