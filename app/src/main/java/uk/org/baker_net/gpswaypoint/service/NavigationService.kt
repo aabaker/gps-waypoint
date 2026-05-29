@@ -95,6 +95,10 @@ class NavigationService : Service() {
     var lastLocation: Location? = null
         private set
 
+    /** Accuracy associated with last GPS position */
+    var gpsAccuracy: Float? = null
+        private set
+
     /** Most recent compass heading in degrees [0, 360). */
     var deviceBearing: Float = 0f
         private set
@@ -191,6 +195,7 @@ class NavigationService : Service() {
         override fun onLocationChanged(location: Location) {
             val prev = lastLocation
             lastLocation = location
+            gpsAccuracy = location.accuracy
 
             // Accumulate elapsed distance
             if (prev != null) {

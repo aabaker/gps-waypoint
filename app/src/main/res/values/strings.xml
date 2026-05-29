@@ -4,11 +4,11 @@
 
     <!-- Navigation UI -->
     <string name="no_route_loaded">No route loaded — tap ⋮ → Load GPX</string>
-    <string name="elapsed_prefix">Elapsed:</string>
-    <string name="remain_prefix">To Go:</string>
-    <string name="label_distance">Distance</string>
+    <string name="label_elapsed">Elapsed Distance</string>
+    <string name="label_remain">Distance Remaining</string>
     <string name="label_heart_rate">Heart Rate</string>
     <string name="hr_not_connected">– bpm</string>
+    <string name="label_accuracy">GPS Accuracy</string>
 
     <!-- Buttons -->
     <string name="btn_prev">◀ Prev</string>

@@ -177,7 +177,8 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
 
         _recordingState.postValue(
             RecordingState(
-                isRecording = svc?.isRecording ?: false
+                isRecording = svc?.isRecording ?: false,
+                gpsAccuracy = svc?.gpsAccuracy ?: null
             )
         )
 

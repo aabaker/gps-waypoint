@@ -22,7 +22,6 @@ sealed class NavigationState {
      * @property distanceToTarget  Straight-line distance to target in metres.
      * @property elapsedDistanceM  Total distance travelled since recording started, metres.
      * @property heartRateBpm      Most recent heart-rate reading (null = no monitor).
-     * @property isRecording       Whether the track recorder is active.
      */
     data class Navigating(
         val waypoints: List<Waypoint>,
