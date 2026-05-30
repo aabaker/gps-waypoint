@@ -159,9 +159,9 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
      * Output: none
      */
     fun stopNav() {
-        _navigationState.postValue(NavigationState.NoRoute)
         val svc = service ?: return
         svc.stopNavigating()
+        refreshState()
     }
 
     // -------------------------------------------------------------------------

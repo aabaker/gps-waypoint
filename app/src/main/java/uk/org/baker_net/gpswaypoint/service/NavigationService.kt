@@ -60,7 +60,7 @@ class NavigationService : Service() {
         private const val RECORD_MIN_DISTANCE_M = 5.0
 
         /** Maximum time since last heart rate update before heart rate data is ignored. */
-        private val HR_MAX_AGE: Duration = 20.seconds
+        private val MAX_DATA_AGE: Duration = 20.seconds
 
         /** Intent action used to bring MainActivity to front from the notification. */
         const val ACTION_NAVIGATE = "uk.org.baker_net.gpswaypoint.NAVIGATE"
@@ -83,6 +83,9 @@ class NavigationService : Service() {
     // State
     // -------------------------------------------------------------------------
 
+    /** The timer used to measure age of sensor data */
+    val timer = TimeSource.Monotonic
+
     /** Ordered list of waypoints loaded from a GPX file. */
     var waypoints: List<Waypoint> = emptyList()
         private set
@@ -99,12 +102,12 @@ class NavigationService : Service() {
     var gpsAccuracy: Float? = null
         private set
 
+    /** When Location was last updated */
+    var lastGpsTime: TimeSource.Monotonic.ValueTimeMark = timer.markNow()
+
     /** Most recent compass heading in degrees [0, 360). */
     var deviceBearing: Float = 0f
         private set
-
-    /** The timer used to measure heartrate age */
-    val timer = TimeSource.Monotonic
 
     /** Most recent heart-rate reading in BPM (null = no monitor). */
     var lastHeartRate: Int? = null
@@ -181,6 +184,7 @@ class NavigationService : Service() {
         if (isRecording) stopRecording()
         waypoints = emptyList()
         elapsedDistanceM = 0f
+        gpsAccuracy = null
     }
 
     // -------------------------------------------------------------------------
@@ -199,6 +203,7 @@ class NavigationService : Service() {
             val prev = lastLocation
             lastLocation = location
             gpsAccuracy = location.accuracy
+            lastGpsTime = timer.markNow()
 
             // Accumulate elapsed distance
             if (prev != null) {
@@ -213,7 +218,7 @@ class NavigationService : Service() {
             checkWaypointArrival(location)
 
             // Check if heart rate data is stale
-            if (lastHeartRateTime < timer.markNow() - HR_MAX_AGE) {
+            if (lastHeartRateTime < timer.markNow() - MAX_DATA_AGE) {
                 lastHeartRate = null
             }
 
@@ -283,6 +288,9 @@ class NavigationService : Service() {
                 val azimuthRad = orientationAngles[0]  // radians, -π..+π
                 deviceBearing = ((Math.toDegrees(azimuthRad.toDouble()) + 360) % 360).toFloat()
                 onStateChanged?.invoke()
+            }
+            if (lastGpsTime < timer.markNow() - MAX_DATA_AGE) {
+                gpsAccuracy = null
             }
         }
 
