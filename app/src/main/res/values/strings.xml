@@ -9,6 +9,8 @@
     <string name="label_heart_rate">Heart Rate</string>
     <string name="hr_not_connected">– bpm</string>
     <string name="label_accuracy">GPS Accuracy</string>
+    <string name="hr_connect_toast">Connected</string>
+    <string name="hr_disconnect_toast">HR Monitor Disconnected</string>
 
     <!-- Buttons -->
     <string name="btn_prev">◀ Prev</string>

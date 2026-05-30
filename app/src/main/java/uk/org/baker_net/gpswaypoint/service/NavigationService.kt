@@ -113,6 +113,9 @@ class NavigationService : Service() {
     /** When heart rate was last updated */
     var lastHeartRateTime: TimeSource.Monotonic.ValueTimeMark = timer.markNow()
 
+    /** The name of the connected HR monitor */
+    var hrMonitorName: String? = null
+
     /** Whether the track recorder is active. */
     var isRecording: Boolean = false
         private set
@@ -477,6 +480,7 @@ class NavigationService : Service() {
             }
             override fun onConnectionStateChanged(connected: Boolean, name: String) {
                 Log.d(TAG, "HR monitor connected=$connected")
+                hrMonitorName = name
                 onStateChanged?.invoke()
             }
         })

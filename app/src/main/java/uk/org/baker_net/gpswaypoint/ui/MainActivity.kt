@@ -258,13 +258,13 @@ class MainActivity : AppCompatActivity() {
      * Output: Observers attached to [viewModel].
      */
     private fun observeViewModel() {
-        viewModel.navigationState.observe(this) { state -> renderState(state) }
+        viewModel.navigationState.observe(this) { state -> renderNavState(state) }
         viewModel.toastMessage.observe(this) { msg ->
             msg?.let {
                 Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
             }
         }
-        viewModel.recordingState.observe(this) { state ->
+        viewModel.locationState.observe(this) { state ->
             // Update record button label
             binding.btnRecord.apply {
                 text = if (state.isRecording)
@@ -272,7 +272,11 @@ class MainActivity : AppCompatActivity() {
                 else
                     getString(R.string.start_recording)
             }
-            binding.tvAccuracy.text     = if (state.gpsAccuracy != null) GeoUtils.formatDistance(state.gpsAccuracy) else "--"
+            binding.tvAccuracy.text = if (state.gpsAccuracy != null) GeoUtils.formatDistance(state.gpsAccuracy) else "--"
+            binding.tvElapsed.text = if (state.isRecording) GeoUtils.formatDistance(state.elapsedDistanceM) else "--"
+            binding.tvHeartRate.text = state.heartRateBpm
+                ?.let { "$it bpm" }
+                ?: getString(R.string.hr_not_connected)
         }
     }
 
@@ -282,16 +286,14 @@ class MainActivity : AppCompatActivity() {
      * Input:  @param state The latest navigation state from the ViewModel.
      * Output: All text views, arrow view, and button labels updated.
      */
-    private fun renderState(state: NavigationState) {
+    private fun renderNavState(state: NavigationState) {
         when (state) {
             is NavigationState.NoRoute -> {
                 binding.tvWaypointName.text    = getString(R.string.no_route_loaded)
                 binding.tvDistance.text        = "--"
                 binding.tvBearing.text         = "--"
-                binding.tvElapsed.text         = "--"
                 binding.tvRemain.text          = "--"
                 binding.tvWaypointCounter.text = "- / -"
-                binding.tvHeartRate.text       = getString(R.string.hr_not_connected)
                 binding.arrowView.arrowRotationDeg = 0f
                 binding.arrowView.hasValidFix  = false
             }
@@ -301,14 +303,11 @@ class MainActivity : AppCompatActivity() {
                 binding.tvWaypointName.text = wp.name
                 binding.tvDistance.text     = GeoUtils.formatDistance(state.distanceToTarget)
                 binding.tvBearing.text      = GeoUtils.formatBearing(state.bearingToTarget)
-                binding.tvElapsed.text      = GeoUtils.formatDistance(state.elapsedDistanceM)
                 binding.tvRemain.text       = GeoUtils.formatDistance(state.distanceToTarget +
                         state.currentWaypoint.distanceRemain)
                 binding.tvWaypointCounter.text =
                     "${state.currentIndex + 1} / ${state.waypoints.size}"
-                binding.tvHeartRate.text = state.heartRateBpm
-                    ?.let { "$it bpm" }
-                    ?: getString(R.string.hr_not_connected)
+
 
                 binding.arrowView.arrowRotationDeg = state.arrowRotation
                 binding.arrowView.hasValidFix       = true

@@ -20,8 +20,7 @@ sealed class NavigationState {
      * @property bearingToTarget   True bearing from device to target, degrees 0-360.
      * @property deviceBearing     Device heading from compass, degrees 0-360.
      * @property distanceToTarget  Straight-line distance to target in metres.
-     * @property elapsedDistanceM  Total distance travelled since recording started, metres.
-     * @property heartRateBpm      Most recent heart-rate reading (null = no monitor).
+
      */
     data class Navigating(
         val waypoints: List<Waypoint>,
@@ -29,8 +28,6 @@ sealed class NavigationState {
         val bearingToTarget: Float,
         val deviceBearing: Float,
         val distanceToTarget: Float,
-        val elapsedDistanceM: Float,
-        val heartRateBpm: Int?
     ) : NavigationState() {
         /** Convenience: the active waypoint. */
         val currentWaypoint: Waypoint get() = waypoints[currentIndex]

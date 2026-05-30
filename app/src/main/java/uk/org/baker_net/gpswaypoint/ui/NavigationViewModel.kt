@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import uk.org.baker_net.gpswaypoint.R
 import uk.org.baker_net.gpswaypoint.model.NavigationState
 import uk.org.baker_net.gpswaypoint.model.Waypoint
 import uk.org.baker_net.gpswaypoint.service.NavigationService
@@ -13,7 +14,7 @@ import uk.org.baker_net.gpswaypoint.util.GeoUtils
 import uk.org.baker_net.gpswaypoint.util.GpxParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import uk.org.baker_net.gpswaypoint.model.RecordingState
+import uk.org.baker_net.gpswaypoint.model.LocationState
 
 /**
  * NavigationViewModel.kt
@@ -37,6 +38,9 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
 
     private val _navigationState = MutableLiveData<NavigationState>(NavigationState.NoRoute)
 
+    /** The last observed value of the HR monitor name, used to detect changes. */
+    private var lastHrMonName: String? = null
+
     /**
      * Observable navigation state consumed by [MainActivity].
      * Emits a new value whenever position, heading, heart rate, or waypoint changes.
@@ -51,8 +55,8 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
      */
     val toastMessage: LiveData<String?> = _toastMessage
 
-    private val _recordingState = MutableLiveData<RecordingState>()
-    val recordingState: LiveData<RecordingState> = _recordingState
+    private val _locationState = MutableLiveData<LocationState>()
+    val locationState: LiveData<LocationState> = _locationState
 
     // -------------------------------------------------------------------------
     // Service reference
@@ -173,15 +177,23 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
      */
     private fun refreshState() {
         val svc = service
-        val wps = svc?.waypoints ?: emptyList()
 
-        _recordingState.postValue(
-            RecordingState(
+        _locationState.postValue(
+            LocationState(
                 isRecording = svc?.isRecording ?: false,
-                gpsAccuracy = svc?.gpsAccuracy ?: null
+                gpsAccuracy = svc?.gpsAccuracy,
+                elapsedDistanceM = svc?.elapsedDistanceM ?: 0f,
+                heartRateBpm = svc?.lastHeartRate
             )
         )
 
+        if (svc?.hrMonitorName != lastHrMonName) {
+            val name = svc?.hrMonitorName
+            _toastMessage.postValue(if (name == null) "HR Monitor Disconnected" else "$name connected")
+            lastHrMonName = name
+        }
+
+        val wps = svc?.waypoints ?: emptyList()
         if (wps.isEmpty()) {
             _navigationState.postValue(NavigationState.NoRoute)
             return
@@ -214,9 +226,7 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
                 currentIndex      = idx,
                 bearingToTarget   = bearingToTarget,
                 deviceBearing     = svc.deviceBearing,
-                distanceToTarget  = distanceToTarget,
-                elapsedDistanceM  = svc.elapsedDistanceM,
-                heartRateBpm      = svc.lastHeartRate
+                distanceToTarget  = distanceToTarget
             )
         )
     }
