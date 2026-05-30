@@ -22,10 +22,7 @@ class NavigationStateTest {
         currentIndex      = currentIndex,
         bearingToTarget   = bearingToTarget,
         deviceBearing     = deviceBearing,
-        distanceToTarget  = 500f,
-        elapsedDistanceM  = 100f,
-        heartRateBpm      = null,
-        isRecording       = false
+        distanceToTarget  = 500f
     )
 
     // -------------------------------------------------------------------------

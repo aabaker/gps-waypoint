@@ -64,6 +64,9 @@ class NavigationService : Service() {
 
         /** Intent action used to bring MainActivity to front from the notification. */
         const val ACTION_NAVIGATE = "uk.org.baker_net.gpswaypoint.NAVIGATE"
+
+        /** The proportion of the new value that is used in the bearing rolling average */
+        const val BEARING_UPDATE_PROPORTION = 0.15f
     }
 
     // -------------------------------------------------------------------------
@@ -286,7 +289,10 @@ class NavigationService : Service() {
             if (SensorManager.getRotationMatrix(rotationMatrix, null, acc, mag)) {
                 SensorManager.getOrientation(rotationMatrix, orientationAngles)
                 val azimuthRad = orientationAngles[0]  // radians, -π..+π
-                deviceBearing = ((Math.toDegrees(azimuthRad.toDouble()) + 360) % 360).toFloat()
+                deviceBearing = GeoUtils.rollingAverageBearing(deviceBearing,
+                    ((Math.toDegrees(azimuthRad.toDouble()) + 360) % 360).toFloat(),
+                    BEARING_UPDATE_PROPORTION)
+
                 onStateChanged?.invoke()
             }
             if (lastGpsTime < timer.markNow() - MAX_DATA_AGE) {

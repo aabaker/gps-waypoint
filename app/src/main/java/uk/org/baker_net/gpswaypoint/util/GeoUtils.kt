@@ -65,6 +65,41 @@ object GeoUtils {
     }
 
     /**
+     * Calculate the rolling average of a bearing. Claude got to write this but was
+     * given a very specific prompt to the extent that ChatGPT produces very similar
+     * code for the same prompt
+     *
+     * @param existingAngle angle in degrees
+     * @param newAngle update value in degrees
+     * @param proportion proportion of the new angle to include in the result
+     *
+     * @return The update angle
+     */
+
+    fun rollingAverageBearing(existingAngle: Float, newAngle: Float, proportion: Float): Float {
+        require(existingAngle in 0f..360f) { "existingAngle must be in range 0..360" }
+        require(newAngle in 0f..360f) { "newAngle must be in range 0..360" }
+        require(proportion in 0f..1f) { "proportion must be in range 0..1" }
+
+        val existingRad = Math.toRadians(existingAngle.toDouble())
+        val newRad = Math.toRadians(newAngle.toDouble())
+
+        val existingX = cos(existingRad)
+        val existingY = sin(existingRad)
+        val newX = cos(newRad)
+        val newY = sin(newRad)
+
+        val avgX = existingX * (1f - proportion) + newX * proportion
+        val avgY = existingY * (1f - proportion) + newY * proportion
+
+        val resultRad = atan2(avgY, avgX)
+        val resultDeg = Math.toDegrees(resultRad).toFloat()
+
+        return (resultDeg + 360f) % 360f
+    }
+
+
+    /**
      * Formats a distance in metres to a human-readable string.
      * Values < 1 000 m are shown as whole metres; values ≥ 1 000 m are
      * shown in kilometres with one decimal place.

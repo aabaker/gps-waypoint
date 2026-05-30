@@ -230,4 +230,164 @@ class GeoUtilsTest {
         val d = GeoUtils.remainingRouteDistance(wps, 5)
         assertEquals(0.0, d, 0.001)
     }
+
+    // rollingAverageBearing
+    data class TestCase(
+        val description: String,
+        val existingAngle: Float,
+        val newAngle: Float,
+        val proportion: Float,
+        val expectedMin: Float,
+        val expectedMax: Float
+    )
+
+    @Test
+    fun testRollingAverageBearing() {
+        val tolerance = 0.5f
+
+        val testCases = listOf(
+            TestCase(
+                description = "Equal weight, 0 and 90 -> 45",
+                existingAngle = 0f,
+                newAngle = 90f,
+                proportion = 0.5f,
+                expectedMin = 45f - tolerance,
+                expectedMax = 45f + tolerance
+            ),
+            TestCase(
+                description = "Equal weight, 90 and 180 -> 135",
+                existingAngle = 90f,
+                newAngle = 180f,
+                proportion = 0.5f,
+                expectedMin = 135f - tolerance,
+                expectedMax = 135f + tolerance
+            ),
+            TestCase(
+                description = "Equal weight, 180 and 270 -> 225",
+                existingAngle = 180f,
+                newAngle = 270f,
+                proportion = 0.5f,
+                expectedMin = 225f - tolerance,
+                expectedMax = 225f + tolerance
+            ),
+            TestCase(
+                description = "Equal weight, 270 and 360 -> 315",
+                existingAngle = 270f,
+                newAngle = 360f,
+                proportion = 0.5f,
+                expectedMin = 315f - tolerance,
+                expectedMax = 315f + tolerance
+            ),
+            TestCase(
+                description = "Proportion 0 -> result equals existingAngle",
+                existingAngle = 45f,
+                newAngle = 200f,
+                proportion = 0f,
+                expectedMin = 45f - tolerance,
+                expectedMax = 45f + tolerance
+            ),
+            TestCase(
+                description = "Proportion 1 -> result equals newAngle",
+                existingAngle = 45f,
+                newAngle = 200f,
+                proportion = 1f,
+                expectedMin = 200f - tolerance,
+                expectedMax = 200f + tolerance
+            ),
+            TestCase(
+                description = "Small proportion, biased toward existing",
+                existingAngle = 100f,
+                newAngle = 160f,
+                proportion = 0.1f,
+                expectedMin = 104f - tolerance,
+                expectedMax = 108f + tolerance
+            ),
+            // Corner cases: wrap-around near 0/360 boundary
+            TestCase(
+                description = "Corner case: 355 and 5 should average near 0/360",
+                existingAngle = 355f,
+                newAngle = 5f,
+                proportion = 0.5f,
+                expectedMin = 359f - tolerance,
+                expectedMax = 361f + tolerance  // handled via modulo check below
+            ),
+            TestCase(
+                description = "Corner case: 358 and 2 should average near 0/360",
+                existingAngle = 358f,
+                newAngle = 2f,
+                proportion = 0.5f,
+                expectedMin = 359f - tolerance,
+                expectedMax = 361f + tolerance
+            ),
+            TestCase(
+                description = "Corner case: 350 and 10 -> ~0/360 with 50/50 weight",
+                existingAngle = 350f,
+                newAngle = 10f,
+                proportion = 0.5f,
+                expectedMin = 359f - tolerance,
+                expectedMax = 361f + tolerance
+            ),
+            TestCase(
+                description = "Corner case: high proportion toward new near boundary (2 degrees)",
+                existingAngle = 359f,
+                newAngle = 1f,
+                proportion = 0.8f,
+                expectedMin = 359.5f - tolerance,
+                expectedMax = 361f + tolerance
+            ),
+            TestCase(
+                description = "Corner case: low proportion toward new near boundary",
+                existingAngle = 359f,
+                newAngle = 1f,
+                proportion = 0.2f,
+                expectedMin = 358.5f - tolerance,
+                expectedMax = 360.5f + tolerance
+            ),
+            TestCase(
+                description = "Same angle -> same result",
+                existingAngle = 123f,
+                newAngle = 123f,
+                proportion = 0.5f,
+                expectedMin = 123f - tolerance,
+                expectedMax = 123f + tolerance
+            ),
+            TestCase(
+                description = "Due north: 0 and 0 -> 0",
+                existingAngle = 0f,
+                newAngle = 0f,
+                proportion = 0.5f,
+                expectedMin = 0f - tolerance,
+                expectedMax = 0f + tolerance
+            ),
+            TestCase(
+                description = "Due north boundaries: 360 and 0 -> ~0 or ~360",
+                existingAngle = 360f,
+                newAngle = 0f,
+                proportion = 0.5f,
+                expectedMin = 0f - tolerance,
+                expectedMax = 0f + tolerance
+            )
+        )
+
+        for (tc in testCases) {
+            val result = GeoUtils.rollingAverageBearing(tc.existingAngle, tc.newAngle, tc.proportion)
+
+            // Normalise result and expected bounds into 0..360 for wrap-around cases
+            val normResult = (result + 360f) % 360f
+            val normMin   = tc.expectedMin % 360f
+            val normMax   = tc.expectedMax % 360f
+
+            val inRange = if (normMin <= normMax) {
+                normResult in normMin..normMax
+            } else {
+                // Range wraps around 0/360
+                normResult >= normMin || normResult <= normMax
+            }
+
+            assertTrue(
+                "${tc.description}: result=$result (normalised=$normResult) not in [$normMin, $normMax]",
+                inRange
+            )
+        }
+    }
 }
