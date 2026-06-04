@@ -296,6 +296,7 @@ class MainActivity : AppCompatActivity() {
                 binding.tvWaypointCounter.text = "- / -"
                 binding.arrowView.arrowRotationDeg = 0f
                 binding.arrowView.hasValidFix  = false
+                binding.btnStop.isEnabled      = false
             }
 
             is NavigationState.Navigating -> {
@@ -310,8 +311,8 @@ class MainActivity : AppCompatActivity() {
 
 
                 binding.arrowView.arrowRotationDeg = state.arrowRotation
-                binding.arrowView.hasValidFix       = true
-
+                binding.arrowView.hasValidFix      = true
+                navigationService?.let { binding.btnStop.isEnabled = !it.isRecording }
             }
         }
     }

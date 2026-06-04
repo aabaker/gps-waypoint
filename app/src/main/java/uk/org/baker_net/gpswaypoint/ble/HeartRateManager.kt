@@ -62,7 +62,7 @@ class HeartRateManager(
          * Called when the BLE peripheral connects or disconnects.
          * @param connected true if just connected, false if disconnected.
          */
-        fun onConnectionStateChanged(connected: Boolean, name: String)
+        fun onConnectionStateChanged(connected: Boolean, name: String?)
     }
 
     private val bluetoothManager =
@@ -196,7 +196,7 @@ class HeartRateManager(
                 }
                 BluetoothProfile.STATE_DISCONNECTED -> {
                     Log.d(TAG, "GATT disconnected")
-                    callback.onConnectionStateChanged(false, name = "")
+                    callback.onConnectionStateChanged(false, name = null)
                 }
             }
         }

@@ -86,8 +86,7 @@ class NavigationService : Service() {
     // State
     // -------------------------------------------------------------------------
 
-    /** The timer used to measure age of sensor data */
-    val timer = TimeSource.Monotonic
+
 
     /** Ordered list of waypoints loaded from a GPX file. */
     var waypoints: List<Waypoint> = emptyList()
@@ -105,9 +104,6 @@ class NavigationService : Service() {
     var gpsAccuracy: Float? = null
         private set
 
-    /** When Location was last updated */
-    var lastGpsTime: TimeSource.Monotonic.ValueTimeMark = timer.markNow()
-
     /** Most recent compass heading in degrees [0, 360). */
     var deviceBearing: Float = 0f
         private set
@@ -115,9 +111,6 @@ class NavigationService : Service() {
     /** Most recent heart-rate reading in BPM (null = no monitor). */
     var lastHeartRate: Int? = null
         private set
-
-    /** When heart rate was last updated */
-    var lastHeartRateTime: TimeSource.Monotonic.ValueTimeMark = timer.markNow()
 
     /** The name of the connected HR monitor */
     var hrMonitorName: String? = null
@@ -137,6 +130,18 @@ class NavigationService : Service() {
     // Internal
     // -------------------------------------------------------------------------
 
+    /** The timer used to measure age of sensor data, needs t */
+    private val timeSource = TimeSource.Monotonic
+
+    /** When heart rate was last updated */
+    var lastHeartRateTime: TimeSource.Monotonic.ValueTimeMark = timeSource.markNow()
+
+    /** When Location was last updated */
+    var lastGpsTime: TimeSource.Monotonic.ValueTimeMark = timeSource.markNow()
+
+    private val handler = Handler(Looper.getMainLooper())
+
+    private var isNavigating = false
     private val trackPoints = mutableListOf<TrackPoint>()
     private var lastRecordedLocation: Location? = null
 
@@ -174,9 +179,13 @@ class NavigationService : Service() {
     }
 
     fun startNavigating() {
-        startGps()
-        startCompass()
-        startHeartRateMonitor()
+        if (!isNavigating) {
+            startGps()
+            startCompass()
+            startHeartRateMonitor()
+            isNavigating = true
+            handler.post(tickRunnable)
+        }
     }
 
     fun stopNavigating() {
@@ -184,12 +193,38 @@ class NavigationService : Service() {
         stopCompass()
         heartRateManager?.disconnect()
         lastHeartRate = null
-        if (isRecording) stopRecording()
         waypoints = emptyList()
         elapsedDistanceM = 0f
         gpsAccuracy = null
+        isNavigating = false
+        handler.removeCallbacks(tickRunnable)
     }
 
+    private val tickRunnable = object : Runnable {
+        override fun run() {
+            if (isNavigating) {
+                onTick()
+                handler.postDelayed(this, 1000L)
+            }
+        }
+    }
+
+
+    // -------------------------------------------------------------------------
+    // Timer
+    // -------------------------------------------------------------------------
+
+    private fun onTick() {
+        // Check if heart rate data is stale
+        if (lastHeartRateTime < timeSource.markNow() - MAX_DATA_AGE) {
+            lastHeartRate = null
+        }
+        // Check if GPS data is stale
+        if (lastGpsTime < timeSource.markNow() - MAX_DATA_AGE) {
+            gpsAccuracy = null
+        }
+        onStateChanged?.invoke()
+    }
     // -------------------------------------------------------------------------
     // GPS
     // -------------------------------------------------------------------------
@@ -206,7 +241,7 @@ class NavigationService : Service() {
             val prev = lastLocation
             lastLocation = location
             gpsAccuracy = location.accuracy
-            lastGpsTime = timer.markNow()
+            lastGpsTime = timeSource.markNow()
 
             // Accumulate elapsed distance
             if (prev != null) {
@@ -220,13 +255,7 @@ class NavigationService : Service() {
             // Auto-advance waypoint if within arrival radius
             checkWaypointArrival(location)
 
-            // Check if heart rate data is stale
-            if (lastHeartRateTime < timer.markNow() - MAX_DATA_AGE) {
-                lastHeartRate = null
-            }
-
             updateNotification()
-            onStateChanged?.invoke()
         }
 
         override fun onProviderEnabled(provider: String) {}
@@ -294,9 +323,6 @@ class NavigationService : Service() {
                     BEARING_UPDATE_PROPORTION)
 
                 onStateChanged?.invoke()
-            }
-            if (lastGpsTime < timer.markNow() - MAX_DATA_AGE) {
-                gpsAccuracy = null
             }
         }
 
@@ -395,7 +421,6 @@ class NavigationService : Service() {
         if (dist <= ARRIVAL_RADIUS_M && currentWaypointIndex < wps.size - 1) {
             Log.d(TAG, "Arrived at waypoint $currentWaypointIndex, advancing")
             currentWaypointIndex++
-            onStateChanged?.invoke()
         }
     }
 
@@ -414,6 +439,10 @@ class NavigationService : Service() {
         elapsedDistanceM = 0f
         lastRecordedLocation = null
         isRecording = true
+        if (!isNavigating) {
+            startGps()
+            startHeartRateMonitor()
+        }
         Log.d(TAG, "Recording started")
     }
 
@@ -427,6 +456,12 @@ class NavigationService : Service() {
      */
     fun stopRecording(): File? {
         isRecording = false
+        if (!isNavigating) {
+            stopGps()
+            heartRateManager?.disconnect()
+            lastHeartRate = null
+            gpsAccuracy = null
+        }
         Log.d(TAG, "Recording stopped, ${trackPoints.size} points")
         return saveTcx()
     }
@@ -489,10 +524,10 @@ class NavigationService : Service() {
         heartRateManager = HeartRateManager(this, object : HeartRateManager.HeartRateCallback {
             override fun onHeartRate(bpm: Int) {
                 lastHeartRate = bpm
-                lastHeartRateTime = timer.markNow()
+                lastHeartRateTime = timeSource.markNow()
                 onStateChanged?.invoke()
             }
-            override fun onConnectionStateChanged(connected: Boolean, name: String) {
+            override fun onConnectionStateChanged(connected: Boolean, name: String?) {
                 Log.d(TAG, "HR monitor connected=$connected")
                 hrMonitorName = name
                 onStateChanged?.invoke()

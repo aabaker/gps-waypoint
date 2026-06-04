@@ -36,10 +36,10 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
     // LiveData
     // -------------------------------------------------------------------------
 
-    private val _navigationState = MutableLiveData<NavigationState>(NavigationState.NoRoute)
-
     /** The last observed value of the HR monitor name, used to detect changes. */
     private var lastHrMonName: String? = null
+
+    private val _navigationState = MutableLiveData<NavigationState>(NavigationState.NoRoute)
 
     /**
      * Observable navigation state consumed by [MainActivity].
