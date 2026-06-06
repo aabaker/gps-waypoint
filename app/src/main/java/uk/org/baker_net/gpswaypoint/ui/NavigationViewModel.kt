@@ -141,12 +141,9 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
     fun toggleRecording() {
         val svc = service ?: return
         if (svc.isRecording) {
-            val file = svc.stopRecording()
-            _toastMessage.postValue(
-                if (file != null) "Saved: ${file.name}" else "Save failed"
-            )
+            val text = svc.stopRecording()
+            _toastMessage.postValue( text )
         } else {
-            svc.startNavigating()
             svc.startRecording()
         }
         refreshState()

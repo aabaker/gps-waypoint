@@ -165,7 +165,6 @@ class NavigationService : Service() {
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         createNotificationChannel()
-        startForeground(NOTIFICATION_ID, buildNotification("Initialising…"))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -180,6 +179,7 @@ class NavigationService : Service() {
 
     fun startNavigating() {
         if (!isNavigating) {
+            startForeground(NOTIFICATION_ID, buildNotification("Initialising…"))
             startGps()
             startCompass()
             startHeartRateMonitor()
@@ -198,11 +198,12 @@ class NavigationService : Service() {
         gpsAccuracy = null
         isNavigating = false
         handler.removeCallbacks(tickRunnable)
+        leaveForeground()
     }
 
     private val tickRunnable = object : Runnable {
         override fun run() {
-            if (isNavigating) {
+            if (isNavigating || isRecording) {
                 onTick()
                 handler.postDelayed(this, 1000L)
             }
@@ -440,6 +441,7 @@ class NavigationService : Service() {
         lastRecordedLocation = null
         isRecording = true
         if (!isNavigating) {
+            startForeground(NOTIFICATION_ID, buildNotification("Initialising…"))
             startGps()
             startHeartRateMonitor()
         }
@@ -454,13 +456,14 @@ class NavigationService : Service() {
      * Output: TCX file written; [isRecording] = false.
      *         Returns the [File] written, or null on error.
      */
-    fun stopRecording(): File? {
+    fun stopRecording(): String {
         isRecording = false
         if (!isNavigating) {
             stopGps()
             heartRateManager?.disconnect()
             lastHeartRate = null
             gpsAccuracy = null
+            leaveForeground()
         }
         Log.d(TAG, "Recording stopped, ${trackPoints.size} points")
         return saveTcx()
@@ -496,7 +499,10 @@ class NavigationService : Service() {
      * Input:  none
      * Output: @return The [File] written, or null if an error occurs.
      */
-    private fun saveTcx(): File? {
+    private fun saveTcx(): String {
+        if (trackPoints.isEmpty()) {
+            return "No data to save"
+        }
         return try {
             val dir = getExternalFilesDir("recordings") ?: filesDir
             dir.mkdirs()
@@ -504,10 +510,10 @@ class NavigationService : Service() {
             val file = File(dir, "activity_$ts.tcx")
             file.outputStream().use { TcxWriter.write(it, trackPoints) }
             Log.d(TAG, "TCX saved: ${file.absolutePath}")
-            file
+            "Saved: ${file.name}"
         } catch (e: Exception) {
             Log.e(TAG, "Failed to save TCX", e)
-            null
+            "Save failed"
         }
     }
 
@@ -542,7 +548,7 @@ class NavigationService : Service() {
     // -------------------------------------------------------------------------
 
     /**
-     * Creates the persistent notification channel required on Android O+.
+     * Creates the persistent notification channel
      *
      * Input:  none
      * Output: Channel registered with the system.
@@ -592,13 +598,29 @@ class NavigationService : Service() {
     private fun updateNotification() {
         val loc = lastLocation ?: return
         val wps = waypoints
-        if (wps.isEmpty()) return
-        val target = wps[currentWaypointIndex]
-        val dist = GeoUtils.haversineDistance(
-            loc.latitude, loc.longitude, target.latitude, target.longitude
-        )
-        val text = "→ ${target.name}  ${GeoUtils.formatDistance(dist.toFloat())}"
+        var text = "No target waypoint"
+        if (!wps.isEmpty()) {
+            val target = wps[currentWaypointIndex]
+            val dist = GeoUtils.haversineDistance(
+                loc.latitude, loc.longitude, target.latitude, target.longitude
+            )
+            text = "→ ${target.name}  ${GeoUtils.formatDistance(dist.toFloat())}"
+        }
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         nm.notify(NOTIFICATION_ID, buildNotification(text))
+    }
+
+    /**
+     * Clear the notification
+     */
+    private fun leaveForeground() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            @Suppress("DEPRECATION")
+            stopForeground(true)
+        }
+        val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        nm.cancel(NOTIFICATION_ID)
     }
 }
