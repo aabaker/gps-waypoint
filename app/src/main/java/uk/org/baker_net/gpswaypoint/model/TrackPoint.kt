@@ -19,5 +19,6 @@ data class TrackPoint(
     val longitude: Double,
     val altitudeM: Double?,
     val heartRateBpm: Int?,
-    val distanceM: Double
+    val distanceM: Double,
+    val speed: Float?
 )

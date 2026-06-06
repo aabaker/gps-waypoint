@@ -484,7 +484,8 @@ class NavigationService : Service() {
                 longitude    = location.longitude,
                 altitudeM    = if (location.hasAltitude()) location.altitude else null,
                 heartRateBpm = lastHeartRate,
-                distanceM    = elapsedDistanceM.toDouble()
+                distanceM    = elapsedDistanceM.toDouble(),
+                speed        = location.speed
             )
         )
     }

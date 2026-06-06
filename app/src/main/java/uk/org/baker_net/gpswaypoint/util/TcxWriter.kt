@@ -64,9 +64,7 @@ object TcxWriter {
         writer.newLine()
         writer.write(
             """<TrainingCenterDatabase xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2
-  http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">"""
+  xmlns:ae="http://www.garmin.com/xmlschemas/ActivityExtension/v2">"""
         )
         writer.newLine()
 
@@ -120,6 +118,10 @@ object TcxWriter {
             writer.newLine()
             tp.altitudeM?.let {
                 writer.write("            <AltitudeMeters>${"%.1f".format(it)}</AltitudeMeters>")
+                writer.newLine()
+            }
+            tp.speed?.let {
+                writer.write("            <Extensions><ae:TPX><ae:Speed>${"%.1f".format(it)}</ae:Speed></ae:TPX></Extensions>")
                 writer.newLine()
             }
             writer.write("            <DistanceMeters>${"%.2f".format(tp.distanceM)}</DistanceMeters>")
