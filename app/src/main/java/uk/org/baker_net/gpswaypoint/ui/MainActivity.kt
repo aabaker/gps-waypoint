@@ -14,10 +14,12 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import uk.org.baker_net.gpswaypoint.R
+import uk.org.baker_net.gpswaypoint.data.PreferencesRepository
 import uk.org.baker_net.gpswaypoint.databinding.ActivityMainBinding
 import uk.org.baker_net.gpswaypoint.model.NavigationState
 import uk.org.baker_net.gpswaypoint.service.NavigationService
 import uk.org.baker_net.gpswaypoint.util.GeoUtils
+import uk.org.baker_net.gpswaypoint.util.UnitSystem
 
 /**
  * MainActivity.kt
@@ -39,6 +41,15 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: NavigationViewModel by viewModels()
+
+    private lateinit var preferencesRepository: PreferencesRepository
+
+    /**
+     * Cached copy of the saved unit system, refreshed in [onResume] so a
+     * change made on the preferences screen takes effect as soon as the
+     * user returns without needing to restart the app.
+     */
+    private var currentUnits: UnitSystem = UnitSystem.METRIC
 
     // -------------------------------------------------------------------------
     // Service binding
@@ -116,6 +127,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
+        preferencesRepository = PreferencesRepository(this)
 
         setupClickListeners()
         observeViewModel()
@@ -126,6 +138,12 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         // Re-bind in case the activity was recreated
         if (!serviceBound) bindNavigationService()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Pick up any unit-system change made on the preferences screen.
+        currentUnits = preferencesRepository.getUnitSystem()
     }
 
     override fun onStop() {
@@ -153,6 +171,10 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.action_toggle_record -> {
                 viewModel.toggleRecording()
+                true
+            }
+            R.id.action_preferences -> {
+                startActivity(Intent(this, PreferencesActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -272,8 +294,8 @@ class MainActivity : AppCompatActivity() {
                 else
                     getString(R.string.start_recording)
             }
-            binding.tvAccuracy.text = if (state.gpsAccuracy != null) GeoUtils.formatDistance(state.gpsAccuracy) else "--"
-            binding.tvElapsed.text = if (state.isRecording) GeoUtils.formatDistance(state.elapsedDistanceM) else "--"
+            binding.tvAccuracy.text = if (state.gpsAccuracy != null) GeoUtils.formatDistance(state.gpsAccuracy, currentUnits) else "--"
+            binding.tvElapsed.text = if (state.isRecording) GeoUtils.formatDistance(state.elapsedDistanceM, currentUnits) else "--"
             binding.tvHeartRate.text = state.heartRateBpm
                 ?.let { "$it bpm" }
                 ?: getString(R.string.hr_not_connected)
@@ -302,10 +324,10 @@ class MainActivity : AppCompatActivity() {
             is NavigationState.Navigating -> {
                 val wp = state.currentWaypoint
                 binding.tvWaypointName.text = wp.name
-                binding.tvDistance.text     = GeoUtils.formatDistance(state.distanceToTarget)
+                binding.tvDistance.text     = GeoUtils.formatDistance(state.distanceToTarget, currentUnits)
                 binding.tvBearing.text      = GeoUtils.formatBearing(state.bearingToTarget)
                 binding.tvRemain.text       = GeoUtils.formatDistance(state.distanceToTarget +
-                        state.currentWaypoint.distanceRemain)
+                        state.currentWaypoint.distanceRemain, currentUnits)
                 binding.tvWaypointCounter.text =
                     "${state.currentIndex + 1} / ${state.waypoints.size}"
 

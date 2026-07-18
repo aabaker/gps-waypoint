@@ -99,20 +99,42 @@ object GeoUtils {
     }
 
 
+    /** Feet per metre (1 ft = 0.3048 m). */
+    private const val METRES_PER_FOOT = 0.3048
+
+    /** Feet per mile, used to switch from feet to miles once a distance is large. */
+    private const val FEET_PER_MILE = 5_280.0
+
     /**
-     * Formats a distance in metres to a human-readable string.
-     * Values < 1 000 m are shown as whole metres; values ≥ 1 000 m are
+     * Formats a distance in metres to a human-readable string in the requested
+     * [units] system.
+     *
+     * Metric: values < 1 000 m are shown as whole metres; values ≥ 1 000 m are
      * shown in kilometres with one decimal place.
+     *
+     * Imperial: values < 1 000 ft are shown as whole feet; values ≥ 1 000 ft are
+     * shown in miles with one decimal place.
      *
      * Input:
      *   @param metres Distance in metres (must be ≥ 0).
+     *   @param units  Measurement unit system to render in. Defaults to
+     *                 [UnitSystem.METRIC] for backwards compatibility with
+     *                 existing call sites and tests.
      *
      * Output:
-     *   @return Formatted string, e.g. "342 m" or "1.4 km".
+     *   @return Formatted string, e.g. "342 m", "1.4 km", "342 ft", or "1.4 mi".
      */
-    fun formatDistance(metres: Float): String =
-        if (metres < 1_000f) "${metres.toInt()} m"
-        else "${"%.1f".format(metres / 1_000f)} km"
+    fun formatDistance(metres: Float, units: UnitSystem = UnitSystem.METRIC): String =
+        when (units) {
+            UnitSystem.METRIC ->
+                if (metres < 1_000f) "${metres.toInt()} m"
+                else "${"%.1f".format(metres / 1_000f)} km"
+            UnitSystem.IMPERIAL -> {
+                val feet = metres / METRES_PER_FOOT
+                if (feet < 1_000.0) "${feet.toInt()} ft"
+                else "${"%.1f".format(feet / FEET_PER_MILE)} mi"
+            }
+        }
 
     /**
      * Formats a bearing in degrees to a cardinal/intercardinal compass label
