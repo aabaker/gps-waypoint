@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import android.util.Xml
 import uk.org.baker_net.gpswaypoint.R
 import uk.org.baker_net.gpswaypoint.model.NavigationState
 import uk.org.baker_net.gpswaypoint.model.Waypoint
@@ -93,7 +94,7 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
                         _toastMessage.postValue("Cannot open file")
                         return@launch
                     }
-                val waypoints: List<Waypoint> = stream.use { GpxParser.parse(it) }
+                val waypoints: List<Waypoint> = stream.use { GpxParser.parse(it, Xml.newPullParser()) }
                 if (waypoints.isEmpty()) {
                     _toastMessage.postValue("No waypoints found in GPX file")
                     return@launch
