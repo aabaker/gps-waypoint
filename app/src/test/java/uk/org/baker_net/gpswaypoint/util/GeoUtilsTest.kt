@@ -168,15 +168,15 @@ class GeoUtilsTest {
     @Test
     fun formatDistance_imperial_lessThan1000ft_showsFeet() {
         // 100 m ≈ 328 ft
-        assertEquals("328 ft", GeoUtils.formatDistance(100f, UnitSystem.IMPERIAL))
-        assertEquals("0 ft", GeoUtils.formatDistance(0f, UnitSystem.IMPERIAL))
+        assertEquals("328 ft", GeoUtils.formatDistance(100f, GeoUtils.UnitSystem.IMPERIAL))
+        assertEquals("0 ft", GeoUtils.formatDistance(0f, GeoUtils.UnitSystem.IMPERIAL))
     }
 
     @Test
     fun formatDistance_imperial_atLeast1000ft_showsMiles() {
         // 1 mile = 1609.344 m
-        assertEquals("1.0 mi", GeoUtils.formatDistance(1609.344f, UnitSystem.IMPERIAL))
-        assertEquals("2.0 mi", GeoUtils.formatDistance(3218.688f, UnitSystem.IMPERIAL))
+        assertEquals("1.0 mi", GeoUtils.formatDistance(1609.344f, GeoUtils.UnitSystem.IMPERIAL))
+        assertEquals("2.0 mi", GeoUtils.formatDistance(3218.688f, GeoUtils.UnitSystem.IMPERIAL))
     }
 
     // -------------------------------------------------------------------------

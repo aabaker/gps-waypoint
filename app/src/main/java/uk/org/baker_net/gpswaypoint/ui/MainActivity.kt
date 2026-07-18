@@ -19,7 +19,6 @@ import uk.org.baker_net.gpswaypoint.databinding.ActivityMainBinding
 import uk.org.baker_net.gpswaypoint.model.NavigationState
 import uk.org.baker_net.gpswaypoint.service.NavigationService
 import uk.org.baker_net.gpswaypoint.util.GeoUtils
-import uk.org.baker_net.gpswaypoint.util.UnitSystem
 
 /**
  * MainActivity.kt
@@ -49,7 +48,7 @@ class MainActivity : AppCompatActivity() {
      * change made on the preferences screen takes effect as soon as the
      * user returns without needing to restart the app.
      */
-    private var currentUnits: UnitSystem = UnitSystem.METRIC
+    private var currentUnits: GeoUtils.UnitSystem = GeoUtils.UnitSystem.METRIC
 
     // -------------------------------------------------------------------------
     // Service binding

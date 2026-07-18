@@ -12,7 +12,17 @@ import kotlin.math.*
  *
  * These functions have no Android dependencies and are fully unit-testable.
  */
+
 object GeoUtils {
+
+    /**
+     * The measurement unit system used when formatting distances for on-screen
+     * display.
+     */
+    enum class UnitSystem {
+        METRIC,
+        IMPERIAL
+    }
 
     /** Mean radius of the Earth in metres (WGS-84 sphere approximation). */
     const val EARTH_RADIUS_M = 6_371_000.0

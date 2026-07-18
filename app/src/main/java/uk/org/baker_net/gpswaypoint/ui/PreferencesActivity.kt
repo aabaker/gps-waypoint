@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import uk.org.baker_net.gpswaypoint.R
 import uk.org.baker_net.gpswaypoint.data.HeartRateMonitorMode
 import uk.org.baker_net.gpswaypoint.databinding.ActivityPreferencesBinding
-import uk.org.baker_net.gpswaypoint.util.UnitSystem
+import uk.org.baker_net.gpswaypoint.util.GeoUtils
 
 /**
  * PreferencesActivity.kt
@@ -21,8 +21,8 @@ import uk.org.baker_net.gpswaypoint.util.UnitSystem
  *   - The measurement unit system (metric or imperial) used throughout the
  *     navigation display.
  *   - Which heart-rate monitor to use when a recording/navigation session
- *     starts: any compatible monitor (the original behaviour), none
- *     (disabled), or one specific monitor picked from a live BLE scan.
+ *     starts: any compatible monitor, none (disabled), or one specific monitor
+ *     picked from a live BLE scan.
  *
  * The BLE scan for the monitor drop-down runs for as long as this screen is
  * visible (started in onResume, stopped in onPause) so the list grows as new
@@ -81,8 +81,8 @@ class PreferencesActivity : AppCompatActivity() {
      */
     private fun setupUnitsRadioGroup() {
         when (viewModel.savedUnitSystem) {
-            UnitSystem.METRIC -> binding.rbMetric.isChecked = true
-            UnitSystem.IMPERIAL -> binding.rbImperial.isChecked = true
+            GeoUtils.UnitSystem.METRIC -> binding.rbMetric.isChecked = true
+            GeoUtils.UnitSystem.IMPERIAL -> binding.rbImperial.isChecked = true
         }
     }
 
@@ -137,7 +137,7 @@ class PreferencesActivity : AppCompatActivity() {
      */
     private fun setupSaveButton() {
         binding.btnSavePreferences.setOnClickListener {
-            val units = if (binding.rbImperial.isChecked) UnitSystem.IMPERIAL else UnitSystem.METRIC
+            val units = if (binding.rbImperial.isChecked) GeoUtils.UnitSystem.IMPERIAL else GeoUtils.UnitSystem.METRIC
             val selectedMonitor = currentOptions.getOrNull(binding.spinnerHrMonitor.selectedItemPosition)
                 ?: HrMonitorOption.Any
             viewModel.savePreferences(units, selectedMonitor)

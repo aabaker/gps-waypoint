@@ -104,10 +104,9 @@ class HeartRateManager(
      *   - Bluetooth must be enabled on the device.
      *
      * Input:  @param targetAddress If non-null, only a peripheral whose BLE MAC
-     *         address matches exactly will be connected to (the "specific
-     *         monitor" preference); other devices found are ignored and
-     *         scanning continues. If null, the first compatible peripheral
-     *         found is used (the "any monitor" preference/legacy behaviour).
+     *         address matches exactly will be connected to, other devices found
+     *         are ignored and scanning continues. If null, the first compatible peripheral
+     *         found is used.
      * Output: none – results delivered via [HeartRateCallback].
      */
     fun startScan(targetAddress: String? = null) {

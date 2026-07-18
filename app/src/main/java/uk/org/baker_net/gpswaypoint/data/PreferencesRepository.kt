@@ -1,14 +1,13 @@
 package uk.org.baker_net.gpswaypoint.data
 
 import android.content.Context
-import uk.org.baker_net.gpswaypoint.util.UnitSystem
+import uk.org.baker_net.gpswaypoint.util.GeoUtils
 
 /**
  * How the app selects a BLE heart-rate monitor when a navigation or
  * recording session starts.
  *
- *   ANY    – connect to the first compatible monitor found (legacy/default
- *            behaviour, unchanged from before preferences existed).
+ *   ANY    – connect to the first compatible monitor found.
  *   NONE   – heart-rate monitoring is disabled entirely; no scan is started.
  *   DEVICE – connect only to the specific monitor identified by
  *            [HeartRateMonitorPreference.deviceAddress].
@@ -59,10 +58,10 @@ class PreferencesRepository(context: Context) {
      * Input:  none
      * Output: @return The saved [UnitSystem], or [UnitSystem.METRIC] if never set.
      */
-    fun getUnitSystem(): UnitSystem =
+    fun getUnitSystem(): GeoUtils.UnitSystem =
         when (db.get(KEY_UNIT_SYSTEM)) {
-            UnitSystem.IMPERIAL.name -> UnitSystem.IMPERIAL
-            else -> UnitSystem.METRIC
+            GeoUtils.UnitSystem.IMPERIAL.name -> GeoUtils.UnitSystem.IMPERIAL
+            else -> GeoUtils.UnitSystem.METRIC
         }
 
     /**
@@ -71,7 +70,7 @@ class PreferencesRepository(context: Context) {
      * Input:  @param units New [UnitSystem] to persist.
      * Output: Preference saved to the database.
      */
-    fun setUnitSystem(units: UnitSystem) {
+    fun setUnitSystem(units: GeoUtils.UnitSystem) {
         db.set(KEY_UNIT_SYSTEM, units.name)
     }
 

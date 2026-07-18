@@ -8,7 +8,7 @@ import uk.org.baker_net.gpswaypoint.ble.HeartRateManager
 import uk.org.baker_net.gpswaypoint.data.HeartRateMonitorMode
 import uk.org.baker_net.gpswaypoint.data.HeartRateMonitorPreference
 import uk.org.baker_net.gpswaypoint.data.PreferencesRepository
-import uk.org.baker_net.gpswaypoint.util.UnitSystem
+import uk.org.baker_net.gpswaypoint.util.GeoUtils
 
 /**
  * A single row in the heart-rate monitor drop-down: either the fixed "Any"
@@ -48,7 +48,7 @@ class PreferencesViewModel(application: Application) : AndroidViewModel(applicat
     val monitorOptions: LiveData<List<HrMonitorOption>> = _monitorOptions
 
     /** The unit system as currently saved (read once when the screen opens). */
-    val savedUnitSystem: UnitSystem = preferencesRepository.getUnitSystem()
+    val savedUnitSystem: GeoUtils.UnitSystem = preferencesRepository.getUnitSystem()
 
     /** The heart-rate monitor preference as currently saved (read once when the screen opens). */
     val savedHeartRateMonitorPreference: HeartRateMonitorPreference =
@@ -118,7 +118,7 @@ class PreferencesViewModel(application: Application) : AndroidViewModel(applicat
      *         @param monitor Selected [HrMonitorOption].
      * Output: Preferences saved to the database.
      */
-    fun savePreferences(units: UnitSystem, monitor: HrMonitorOption) {
+    fun savePreferences(units: GeoUtils.UnitSystem, monitor: HrMonitorOption) {
         preferencesRepository.setUnitSystem(units)
         val preference = when (monitor) {
             is HrMonitorOption.Any -> HeartRateMonitorPreference(HeartRateMonitorMode.ANY)
