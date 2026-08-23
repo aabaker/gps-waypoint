@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_preferences.xml
+    Preferences screen layout.
+
+    Sections (top to bottom):
+      1. MaterialToolbar     – screen title, back navigation
+      2. Units section       – RadioGroup: Metric / Imperial
+      3. Heart rate section  – Spinner: Any / None / discovered monitors,
+                                plus a small "scanning…" hint
+      4. Save button
+-->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".ui.PreferencesActivity">
+
+    <!-- Toolbar -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarPreferences"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        app:titleTextColor="@color/colorOnPrimary"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:title="@string/preferences_title" />
+
+    <!-- Units section label -->
+    <TextView
+        android:id="@+id/tvUnitsLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:text="@string/preferences_units_label"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorSecondary"
+        android:textAllCaps="true"
+        app:layout_constraintTop_toBottomOf="@id/toolbarPreferences"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Units radio group -->
+    <RadioGroup
+        android:id="@+id/rgUnits"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/tvUnitsLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <RadioButton
+            android:id="@+id/rbMetric"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/preferences_units_metric" />
+
+        <RadioButton
+            android:id="@+id/rbImperial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/preferences_units_imperial" />
+    </RadioGroup>
+
+    <!-- Heart rate monitor section label -->
+    <TextView
+        android:id="@+id/tvHrLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:text="@string/preferences_hr_label"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorSecondary"
+        android:textAllCaps="true"
+        app:layout_constraintTop_toBottomOf="@id/rgUnits"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Heart rate monitor drop-down -->
+    <Spinner
+        android:id="@+id/spinnerHrMonitor"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:background="@color/colorSurface"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tvHrLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Scanning hint -->
+    <TextView
+        android:id="@+id/tvScanningHint"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:text="@string/preferences_scanning_hint"
+        android:textSize="12sp"
+        android:textStyle="italic"
+        android:textColor="@color/colorSecondary"
+        app:layout_constraintTop_toBottomOf="@id/spinnerHrMonitor"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Save button -->
+    <Button
+        android:id="@+id/btnSavePreferences"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/preferences_save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

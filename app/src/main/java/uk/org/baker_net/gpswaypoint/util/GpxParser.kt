@@ -1,6 +1,5 @@
 package uk.org.baker_net.gpswaypoint.util
 
-import android.util.Xml
 import uk.org.baker_net.gpswaypoint.model.Waypoint
 import org.xmlpull.v1.XmlPullParser
 import java.io.InputStream
@@ -37,9 +36,8 @@ object GpxParser {
      * @throws org.xmlpull.v1.XmlPullParserException if the XML is malformed.
      * @throws java.io.IOException on read errors.
      */
-    fun parse(stream: InputStream): List<Waypoint> {
+    fun parse(stream: InputStream, parser: XmlPullParser): List<Waypoint> {
         val waypoints = mutableListOf<Waypoint>()
-        val parser: XmlPullParser = Xml.newPullParser()
         parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
         parser.setInput(stream, null)
 

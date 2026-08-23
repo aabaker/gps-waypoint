@@ -13,6 +13,8 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import uk.org.baker_net.gpswaypoint.R
 import uk.org.baker_net.gpswaypoint.ble.HeartRateManager
+import uk.org.baker_net.gpswaypoint.data.HeartRateMonitorMode
+import uk.org.baker_net.gpswaypoint.data.PreferencesRepository
 import uk.org.baker_net.gpswaypoint.model.TrackPoint
 import uk.org.baker_net.gpswaypoint.model.Waypoint
 import uk.org.baker_net.gpswaypoint.ui.MainActivity
@@ -155,6 +157,9 @@ class NavigationService : Service() {
 
     private var heartRateManager: HeartRateManager? = null
 
+    /** Reads the persisted unit system and heart-rate monitor preferences. */
+    private lateinit var preferencesRepository: PreferencesRepository
+
     // -------------------------------------------------------------------------
     // Service lifecycle
     // -------------------------------------------------------------------------
@@ -164,6 +169,7 @@ class NavigationService : Service() {
         Log.d(TAG, "Service created")
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        preferencesRepository = PreferencesRepository(this)
         createNotificationChannel()
     }
 
@@ -522,12 +528,24 @@ class NavigationService : Service() {
     // -------------------------------------------------------------------------
 
     /**
-     * Initialises and starts scanning for a BLE heart-rate monitor.
+     * Initialises and starts scanning for a BLE heart-rate monitor, honouring
+     * the user's saved preference:
+     *   - [HeartRateMonitorMode.NONE]: heart-rate monitoring is skipped entirely.
+     *   - [HeartRateMonitorMode.ANY]: connects to the first compatible monitor
+     *     found, as the app always did before this preference existed.
+     *   - [HeartRateMonitorMode.DEVICE]: only connects to the specific monitor
+     *     address saved in preferences; other monitors found are ignored.
      *
      * Input:  none
-     * Output: [heartRateManager] created and scan started.
+     * Output: [heartRateManager] created and scan started, unless disabled.
      */
     private fun startHeartRateMonitor() {
+        val preference = preferencesRepository.getHeartRateMonitorPreference()
+        if (preference.mode == HeartRateMonitorMode.NONE) {
+            Log.d(TAG, "Heart rate monitoring disabled by preference")
+            return
+        }
+
         heartRateManager = HeartRateManager(this, object : HeartRateManager.HeartRateCallback {
             override fun onHeartRate(bpm: Int) {
                 lastHeartRate = bpm
@@ -540,7 +558,9 @@ class NavigationService : Service() {
                 onStateChanged?.invoke()
             }
         })
-        heartRateManager?.startScan()
+        val targetAddress = if (preference.mode == HeartRateMonitorMode.DEVICE)
+            preference.deviceAddress else null
+        heartRateManager?.startScan(targetAddress)
     }
 
     // -------------------------------------------------------------------------

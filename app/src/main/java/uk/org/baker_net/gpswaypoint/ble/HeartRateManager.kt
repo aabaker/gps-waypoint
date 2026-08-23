@@ -65,6 +65,19 @@ class HeartRateManager(
         fun onConnectionStateChanged(connected: Boolean, name: String?)
     }
 
+    /**
+     * Callback interface implemented by the preferences screen to receive
+     * devices as they are found during a non-connecting [startDiscovery] scan.
+     */
+    interface DiscoveryCallback {
+        /**
+         * Called once for each distinct BLE Heart Rate Service peripheral found.
+         * @param address BLE MAC address of the device, used to identify it later.
+         * @param name Advertised device name, or null if unavailable.
+         */
+        fun onDeviceFound(address: String, name: String?)
+    }
+
     private val bluetoothManager =
         context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     private val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
@@ -73,22 +86,30 @@ class HeartRateManager(
     private var scanCallback: ScanCallback? = null
     private var deviceName: String = ""
 
+    private var discoveryScanner: BluetoothLeScanner? = null
+    private var discoveryScanCallback: ScanCallback? = null
+    private val discoveredAddresses = mutableSetOf<String>()
+
     // -------------------------------------------------------------------------
     // Scanning
     // -------------------------------------------------------------------------
 
     /**
      * Starts a BLE scan looking for peripherals advertising the Heart Rate Service.
-     * Scanning stops automatically when a device is found or after [SCAN_TIMEOUT_MS].
+     * Scanning stops automatically when a matching device is found or after
+     * [SCAN_TIMEOUT_MS].
      *
      * Preconditions:
      *   - BLUETOOTH_SCAN permission must be granted (Android 12+).
      *   - Bluetooth must be enabled on the device.
      *
-     * Input:  none
+     * Input:  @param targetAddress If non-null, only a peripheral whose BLE MAC
+     *         address matches exactly will be connected to, other devices found
+     *         are ignored and scanning continues. If null, the first compatible peripheral
+     *         found is used.
      * Output: none – results delivered via [HeartRateCallback].
      */
-    fun startScan() {
+    fun startScan(targetAddress: String? = null) {
         if (!hasBluetoothPermission()) {
             Log.w(TAG, "Missing BLE permission, scan aborted")
             return
@@ -112,6 +133,10 @@ class HeartRateManager(
 
         val cb = object : ScanCallback() {
             override fun onScanResult(callbackType: Int, result: ScanResult) {
+                if (targetAddress != null && result.device.address != targetAddress) {
+                    // Not the monitor the user selected in preferences; keep scanning.
+                    return
+                }
                 Log.d(TAG, "Found HR device: ${result.device.address}")
                 deviceName = result.device.name
                 stopScan()
@@ -125,7 +150,7 @@ class HeartRateManager(
 
         @Suppress("MissingPermission")
         scanner?.startScan(listOf(filter), settings, cb)
-        Log.d(TAG, "BLE scan started")
+        Log.d(TAG, "BLE scan started" + (targetAddress?.let { " (target=$it)" } ?: ""))
     }
 
     /**
@@ -139,6 +164,78 @@ class HeartRateManager(
         @Suppress("MissingPermission")
         scanner?.stopScan(scanCallback)
         scanCallback = null
+    }
+
+    /**
+     * Starts a continuous BLE scan for the preferences screen: every distinct
+     * peripheral advertising the Heart Rate Service is reported via
+     * [DiscoveryCallback.onDeviceFound] as it is found. Unlike [startScan],
+     * this never connects to a device and never stops on its own – the caller
+     * must call [stopDiscovery] (e.g. when the preferences screen closes).
+     *
+     * Preconditions:
+     *   - BLUETOOTH_SCAN permission must be granted (Android 12+).
+     *   - Bluetooth must be enabled on the device.
+     *
+     * Input:  @param callback Receives each newly discovered device.
+     * Output: none – results delivered via [callback] as they arrive.
+     */
+    fun startDiscovery(callback: DiscoveryCallback) {
+        if (!hasBluetoothPermission()) {
+            Log.w(TAG, "Missing BLE permission, discovery aborted")
+            return
+        }
+        val adapter = bluetoothAdapter ?: run {
+            Log.w(TAG, "Bluetooth not available")
+            return
+        }
+        if (!adapter.isEnabled) {
+            Log.w(TAG, "Bluetooth is disabled")
+            return
+        }
+
+        discoveredAddresses.clear()
+        discoveryScanner = adapter.bluetoothLeScanner
+        val filter = ScanFilter.Builder()
+            .setServiceUuid(android.os.ParcelUuid(HR_SERVICE_UUID))
+            .build()
+        val settings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .build()
+
+        val cb = object : ScanCallback() {
+            @Suppress("MissingPermission")
+            override fun onScanResult(callbackType: Int, result: ScanResult) {
+                val address = result.device.address
+                if (discoveredAddresses.add(address)) {
+                    val name = result.device.name ?: result.scanRecord?.deviceName
+                    Log.d(TAG, "Discovery found HR device: $address ($name)")
+                    callback.onDeviceFound(address, name)
+                }
+            }
+            override fun onScanFailed(errorCode: Int) {
+                Log.e(TAG, "BLE discovery scan failed, code=$errorCode")
+            }
+        }
+        discoveryScanCallback = cb
+
+        @Suppress("MissingPermission")
+        discoveryScanner?.startScan(listOf(filter), settings, cb)
+        Log.d(TAG, "BLE discovery scan started")
+    }
+
+    /**
+     * Stops an in-progress discovery scan started by [startDiscovery].
+     *
+     * Input:  none
+     * Output: none
+     */
+    fun stopDiscovery() {
+        if (!hasBluetoothPermission()) return
+        @Suppress("MissingPermission")
+        discoveryScanner?.stopScan(discoveryScanCallback)
+        discoveryScanCallback = null
+        Log.d(TAG, "BLE discovery scan stopped")
     }
 
     // -------------------------------------------------------------------------

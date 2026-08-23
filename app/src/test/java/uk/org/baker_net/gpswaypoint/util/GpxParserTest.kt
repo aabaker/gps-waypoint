@@ -5,6 +5,7 @@ package uk.org.baker_net.gpswaypoint.util
 
 import org.junit.Assert.*
 import org.junit.Test
+import org.xmlpull.v1.XmlPullParserFactory
 
 /**
  * GpxParserTest.kt
@@ -25,13 +26,13 @@ class GpxParserTest {
      * Output: @return List of parsed Waypoint objects.
      */
     private fun parse(gpx: String) =
-        GpxParser.parse(gpx.trimIndent().byteInputStream())
+        GpxParser.parse(gpx.trimIndent().byteInputStream(), XmlPullParserFactory.newInstance().newPullParser())
 
     // -------------------------------------------------------------------------
     // Waypoint (<wpt>) parsing
     // -------------------------------------------------------------------------
 
-    //@Test
+    @Test
     fun parse_singleWpt_returnsOneWaypoint() {
         val gpx = """
             <?xml version="1.0"?>
@@ -50,7 +51,7 @@ class GpxParserTest {
         assertEquals(15.0, wps[0].elevation!!, 0.001)
     }
 
-    //@Test
+    @Test
     fun parse_multipleWpts_returnAllInOrder() {
         val gpx = """
             <?xml version="1.0"?>
@@ -67,7 +68,7 @@ class GpxParserTest {
         assertEquals("C", wps[2].name)
     }
 
-    //@Test
+    @Test
     fun parse_wptWithoutName_generatesAutoName() {
         val gpx = """
             <?xml version="1.0"?>
@@ -80,7 +81,7 @@ class GpxParserTest {
         assertTrue("Auto name should start with WP", wps[0].name.startsWith("WP"))
     }
 
-    //@Test
+    @Test
     fun parse_wptWithoutElevation_elevationIsNull() {
         val gpx = """
             <?xml version="1.0"?>
@@ -96,7 +97,7 @@ class GpxParserTest {
     // Route (<rte> / <rtept>) parsing
     // -------------------------------------------------------------------------
 
-    //@Test
+    @Test
     fun parse_routePoints_returnedAsWaypoints() {
         val gpx = """
             <?xml version="1.0"?>
@@ -118,7 +119,7 @@ class GpxParserTest {
     // Track (<trk> / <trkseg> / <trkpt>) parsing
     // -------------------------------------------------------------------------
 
-    //@Test
+    @Test
     fun parse_trackPoints_returnedAsWaypoints() {
         val gpx = """
             <?xml version="1.0"?>
@@ -141,14 +142,14 @@ class GpxParserTest {
     // Mixed / empty
     // -------------------------------------------------------------------------
 
-    //@Test
+    @Test
     fun parse_emptyGpx_returnsEmptyList() {
         val gpx = """<?xml version="1.0"?><gpx version="1.1"></gpx>"""
         val wps = parse(gpx)
         assertTrue(wps.isEmpty())
     }
 
-    //@Test
+    @Test
     fun parse_wptMissingLatLon_skipped() {
         // lat/lon attributes missing – should not produce a waypoint
         val gpx = """
@@ -163,7 +164,7 @@ class GpxParserTest {
         assertEquals("Valid", wps[0].name)
     }
 
-    //@Test
+    @Test
     fun parse_mixedWptAndTrkpt_allReturned() {
         val gpx = """
             <?xml version="1.0"?>

@@ -59,6 +59,13 @@
             </intent-filter>
         </activity>
 
+        <!-- Preferences screen: units and heart-rate monitor selection -->
+        <activity
+            android:name=".ui.PreferencesActivity"
+            android:exported="false"
+            android:label="@string/preferences_title"
+            android:parentActivityName=".ui.MainActivity" />
+
         <!-- Foreground service that manages GPS location updates and recording -->
         <service
             android:name=".service.NavigationService"

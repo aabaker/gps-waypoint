@@ -22,4 +22,18 @@
     <!-- Menu items -->
     <string name="menu_load_gpx">Load GPX…</string>
     <string name="menu_toggle_record">Toggle Record</string>
+    <string name="menu_preferences">Preferences</string>
+
+    <!-- Preferences screen -->
+    <string name="preferences_title">Preferences</string>
+    <string name="preferences_units_label">Measurement units</string>
+    <string name="preferences_units_metric">Metric (metres / kilometres)</string>
+    <string name="preferences_units_imperial">Imperial (feet / miles)</string>
+    <string name="preferences_hr_label">Heart rate monitor</string>
+    <string name="preferences_hr_any">Any</string>
+    <string name="preferences_hr_none">None</string>
+    <string name="preferences_scanning_hint">Scanning for nearby heart rate monitors…</string>
+    <string name="preferences_save">Save</string>
+    <string name="preferences_saved_toast">Preferences saved</string>
+    <string name="preferences_bluetooth_permission_missing">Bluetooth permission needed to scan for monitors</string>
 </resources>

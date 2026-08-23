@@ -36,7 +36,7 @@ class TcxWriterTest {
         alt: Double? = 10.0,
         hr: Int? = 72,
         dist: Double = 0.0
-    ) = TrackPoint(ts, lat, lon, alt, hr, dist)
+    ) = TrackPoint(ts, lat, lon, alt, hr, dist, null)
 
     // -------------------------------------------------------------------------
     // Structure tests
