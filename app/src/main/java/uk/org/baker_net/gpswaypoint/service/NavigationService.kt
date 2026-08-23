@@ -121,6 +121,10 @@ class NavigationService : Service() {
     var isRecording: Boolean = false
         private set
 
+    /** Whether GPS and Heartrate monitoring are active */
+    var isTracking = false
+        private set
+
     /** Cumulative distance travelled during the current recording in metres. */
     var elapsedDistanceM: Float = 0f
         private set
@@ -136,14 +140,13 @@ class NavigationService : Service() {
     private val timeSource = TimeSource.Monotonic
 
     /** When heart rate was last updated */
-    var lastHeartRateTime: TimeSource.Monotonic.ValueTimeMark = timeSource.markNow()
+    private var lastHeartRateTime: TimeSource.Monotonic.ValueTimeMark = timeSource.markNow()
 
     /** When Location was last updated */
-    var lastGpsTime: TimeSource.Monotonic.ValueTimeMark = timeSource.markNow()
+    private var lastGpsTime: TimeSource.Monotonic.ValueTimeMark = timeSource.markNow()
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private var isNavigating = false
     private val trackPoints = mutableListOf<TrackPoint>()
     private var lastRecordedLocation: Location? = null
 
@@ -179,22 +182,21 @@ class NavigationService : Service() {
 
     override fun onDestroy() {
         Log.d(TAG, "Service destroyed")
-        stopNavigating()
+        stopTracking()
         super.onDestroy()
     }
 
-    fun startNavigating() {
-        if (!isNavigating) {
+    fun startTracking() {
+        if (!isTracking) {
             startForeground(NOTIFICATION_ID, buildNotification("Initialising…"))
             startGps()
-            startCompass()
             startHeartRateMonitor()
-            isNavigating = true
+            isTracking = true
             handler.post(tickRunnable)
         }
     }
 
-    fun stopNavigating() {
+    fun stopTracking() {
         stopGps()
         stopCompass()
         heartRateManager?.disconnect()
@@ -202,14 +204,14 @@ class NavigationService : Service() {
         waypoints = emptyList()
         elapsedDistanceM = 0f
         gpsAccuracy = null
-        isNavigating = false
+        isTracking = false
         handler.removeCallbacks(tickRunnable)
         leaveForeground()
     }
 
     private val tickRunnable = object : Runnable {
         override fun run() {
-            if (isNavigating || isRecording) {
+            if (isTracking) {
                 onTick()
                 handler.postDelayed(this, 1000L)
             }
@@ -242,7 +244,7 @@ class NavigationService : Service() {
          *
          * Input:  @param location The new device [Location].
          * Output: Updates [lastLocation], advances waypoint if within arrival radius,
-         *         appends a [TrackPoint] if recording, notifies [onStateChanged].
+         *         appends a [TrackPoint] if recording.
          */
         override fun onLocationChanged(location: Location) {
             val prev = lastLocation
@@ -380,6 +382,7 @@ class NavigationService : Service() {
     fun loadWaypoints(wps: List<Waypoint>) {
         waypoints = wps
         currentWaypointIndex = 0
+        startCompass()
         onStateChanged?.invoke()
         Log.d(TAG, "Loaded ${wps.size} waypoints")
     }
@@ -446,7 +449,7 @@ class NavigationService : Service() {
         elapsedDistanceM = 0f
         lastRecordedLocation = null
         isRecording = true
-        if (!isNavigating) {
+        if (!isTracking) {
             startForeground(NOTIFICATION_ID, buildNotification("Initialising…"))
             startGps()
             startHeartRateMonitor()
@@ -464,7 +467,7 @@ class NavigationService : Service() {
      */
     fun stopRecording(): String {
         isRecording = false
-        if (!isNavigating) {
+        if (!isTracking) {
             stopGps()
             heartRateManager?.disconnect()
             lastHeartRate = null
