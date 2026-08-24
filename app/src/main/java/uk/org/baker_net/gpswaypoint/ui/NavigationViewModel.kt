@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import android.util.Xml
-import uk.org.baker_net.gpswaypoint.R
 import uk.org.baker_net.gpswaypoint.model.NavigationState
 import uk.org.baker_net.gpswaypoint.model.Waypoint
 import uk.org.baker_net.gpswaypoint.service.NavigationService
@@ -99,7 +98,7 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
                     _toastMessage.postValue("No waypoints found in GPX file")
                     return@launch
                 }
-                service?.startNavigating()
+                service?.startTracking()
                 service?.loadWaypoints(waypoints)
                 _toastMessage.postValue("Loaded ${waypoints.size} waypoints")
             } catch (e: Exception) {
@@ -156,9 +155,13 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
      * Input: none
      * Output: none
      */
-    fun stopNav() {
+    fun toggleTrack() {
         val svc = service ?: return
-        svc.stopNavigating()
+        if (svc.isTracking) {
+            svc.stopTracking()
+        } else {
+            svc.startTracking()
+        }
         refreshState()
     }
 

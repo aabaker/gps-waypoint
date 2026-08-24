@@ -17,6 +17,8 @@
     <string name="btn_next">Next ▶</string>
     <string name="start_recording">⏺ Start Recording</string>
     <string name="stop_recording">⏹ Stop Recording</string>
+    <string name="start_track">Start Tracking</string>
+    <string name="stop_track">Stop Tracking</string>
     <string name="stop_nav">Stop Navigating</string>
 
     <!-- Menu items -->

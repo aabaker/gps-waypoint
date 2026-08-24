@@ -269,7 +269,7 @@ class MainActivity : AppCompatActivity() {
         binding.btnPrevWaypoint.setOnClickListener { viewModel.previousWaypoint() }
         binding.btnNextWaypoint.setOnClickListener { viewModel.nextWaypoint()  }
         binding.btnRecord.setOnClickListener { viewModel.toggleRecording() }
-        binding.btnStop.setOnClickListener { viewModel.stopNav() }
+        binding.btnTrack.setOnClickListener { viewModel.toggleTrack() }
     }
 
     /**
@@ -293,6 +293,7 @@ class MainActivity : AppCompatActivity() {
                 else
                     getString(R.string.start_recording)
             }
+            binding.btnTrack.isEnabled      = !state.isRecording
             binding.tvAccuracy.text = if (state.gpsAccuracy != null) GeoUtils.formatDistance(state.gpsAccuracy, currentUnits) else "--"
             binding.tvElapsed.text = if (state.isRecording) GeoUtils.formatDistance(state.elapsedDistanceM, currentUnits) else "--"
             binding.tvHeartRate.text = state.heartRateBpm
@@ -310,6 +311,12 @@ class MainActivity : AppCompatActivity() {
     private fun renderNavState(state: NavigationState) {
         when (state) {
             is NavigationState.NoRoute -> {
+                binding.btnTrack.apply {
+                    text = if (navigationService?.isTracking == true)
+                        getString(R.string.stop_track)
+                    else
+                        getString(R.string.start_track)
+                }
                 binding.tvWaypointName.text    = getString(R.string.no_route_loaded)
                 binding.tvDistance.text        = "--"
                 binding.tvBearing.text         = "--"
@@ -317,11 +324,11 @@ class MainActivity : AppCompatActivity() {
                 binding.tvWaypointCounter.text = "- / -"
                 binding.arrowView.arrowRotationDeg = 0f
                 binding.arrowView.hasValidFix  = false
-                binding.btnStop.isEnabled      = false
             }
 
             is NavigationState.Navigating -> {
                 val wp = state.currentWaypoint
+                binding.btnTrack.text = getString(R.string.stop_nav)
                 binding.tvWaypointName.text = wp.name
                 binding.tvDistance.text     = GeoUtils.formatDistance(state.distanceToTarget, currentUnits)
                 binding.tvBearing.text      = GeoUtils.formatBearing(state.bearingToTarget)
@@ -333,7 +340,7 @@ class MainActivity : AppCompatActivity() {
 
                 binding.arrowView.arrowRotationDeg = state.arrowRotation
                 binding.arrowView.hasValidFix      = true
-                navigationService?.let { binding.btnStop.isEnabled = !it.isRecording }
+                navigationService?.let { binding.btnTrack.isEnabled = !it.isRecording }
             }
         }
     }
