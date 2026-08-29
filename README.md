@@ -198,6 +198,16 @@ The app should include all of the needed resource files.
 The app should include unit tests for algorithmic functions but not the UI.
 The source code should include comments describing the purpose, inputs and outputs of each function.
 
+### Prefs View
+Create a preferences view for the code at https://github.com/aabaker/gps-waypoint
+The preferences should allow the user to select between metric and imperial measurements for the display.
+It should also allow the user to select the heartrate monitor to use.
+It should provide a drop down listing choices of Any which will cause the code to accept any heatrate monitor
+when a recording starts as it does now, none which will disable heart rate monitoring and any monitors which are present when making the selection.
+The existing heartrate monitor code should be modified so that the scan functionality can be active when
+selecting preferences and it will update the list of options in the preferences each time a new monitor is found.
+The preferences should be saved to an sqlite databse.
+
 ### Map View
 Add a map view to the application at https://github.com/aabaker/gps-waypoint accessed via the menu.
 The map should display the planned route (waypoints) in red and the elapsed route (trackpoints) in blue with the current location in white.
