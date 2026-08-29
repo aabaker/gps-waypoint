@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import uk.org.baker_net.gpswaypoint.R
 import uk.org.baker_net.gpswaypoint.data.HeartRateMonitorMode
+import uk.org.baker_net.gpswaypoint.data.MapBackground
 import uk.org.baker_net.gpswaypoint.databinding.ActivityPreferencesBinding
 import uk.org.baker_net.gpswaypoint.util.GeoUtils
 
@@ -47,6 +48,7 @@ class PreferencesActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         setupUnitsRadioGroup()
+        setupMapBackgroundRadioGroup()
         setupMonitorSpinner()
         setupSaveButton()
         observeViewModel()
@@ -83,6 +85,19 @@ class PreferencesActivity : AppCompatActivity() {
         when (viewModel.savedUnitSystem) {
             GeoUtils.UnitSystem.METRIC -> binding.rbMetric.isChecked = true
             GeoUtils.UnitSystem.IMPERIAL -> binding.rbImperial.isChecked = true
+        }
+    }
+
+    /**
+     * Selects the radio button matching the currently saved map background.
+     *
+     * Input:  none
+     * Output: [binding.rgMapBackground] selection set.
+     */
+    private fun setupMapBackgroundRadioGroup() {
+        when (viewModel.savedMapBackground) {
+            MapBackground.BLACK -> binding.rbMapBlack.isChecked = true
+            MapBackground.OSM -> binding.rbMapOsm.isChecked = true
         }
     }
 
@@ -140,7 +155,8 @@ class PreferencesActivity : AppCompatActivity() {
             val units = if (binding.rbImperial.isChecked) GeoUtils.UnitSystem.IMPERIAL else GeoUtils.UnitSystem.METRIC
             val selectedMonitor = currentOptions.getOrNull(binding.spinnerHrMonitor.selectedItemPosition)
                 ?: HrMonitorOption.Any
-            viewModel.savePreferences(units, selectedMonitor)
+            val mapBackground = if (binding.rbMapOsm.isChecked) MapBackground.OSM else MapBackground.BLACK
+            viewModel.savePreferences(units, selectedMonitor, mapBackground)
             Toast.makeText(this, getString(R.string.preferences_saved_toast), Toast.LENGTH_SHORT).show()
             finish()
         }

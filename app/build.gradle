@@ -27,12 +27,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 
     kotlinOptions {
-        jvmTarget = '17'
+        jvmTarget = '21'
     }
 
     buildFeatures {
@@ -63,6 +63,13 @@ dependencies {
 
     // DocumentFile for SAF (Storage Access Framework) GPX picking
     implementation 'androidx.documentfile:documentfile:1.0.1'
+
+    // MapLibre Native: map view used by MapActivity. Supplies the pannable/
+    // zoomable map surface, OSM raster tile rendering, and the GeoJSON
+    // source/layer overlays used to draw the planned route, elapsed route,
+    // and current location. Actively maintained (unlike osmdroid, which was
+    // archived by its maintainers in November 2024 with no further releases).
+    implementation 'org.maplibre.gl:android-sdk:13.5.1'
 
     // Unit testing
     testImplementation 'junit:junit:4.13.2'

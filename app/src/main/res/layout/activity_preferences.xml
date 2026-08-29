@@ -8,7 +8,8 @@
       2. Units section       – RadioGroup: Metric / Imperial
       3. Heart rate section  – Spinner: Any / None / discovered monitors,
                                 plus a small "scanning…" hint
-      4. Save button
+      4. Map background section – RadioGroup: Plain black / OpenStreetMap tiles
+      5. Save button
 -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -122,15 +123,61 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Map background section label -->
+    <TextView
+        android:id="@+id/tvMapBackgroundLabel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:text="@string/preferences_map_background_label"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorSecondary"
+        android:textAllCaps="true"
+        app:layout_constraintTop_toBottomOf="@id/tvScanningHint"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Map background radio group -->
+    <RadioGroup
+        android:id="@+id/rgMapBackground"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/tvMapBackgroundLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <RadioButton
+            android:id="@+id/rbMapBlack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/preferences_map_background_black" />
+
+        <RadioButton
+            android:id="@+id/rbMapOsm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/preferences_map_background_osm" />
+    </RadioGroup>
+
     <!-- Save button -->
     <Button
         android:id="@+id/btnSavePreferences"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
         android:text="@string/preferences_save"
+        app:layout_constraintTop_toBottomOf="@id/rgMapBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

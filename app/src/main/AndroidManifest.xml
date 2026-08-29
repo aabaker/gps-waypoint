@@ -9,12 +9,21 @@
       - FOREGROUND_SERVICE_LOCATION: required sub-type for location foreground services (API 34+)
     No WRITE_EXTERNAL_STORAGE is requested; TCX files are written to app-specific
     external storage (getExternalFilesDir) which requires no runtime permission.
+
+    INTERNET / ACCESS_NETWORK_STATE are normal (not runtime) permissions used
+    only by the map's optional "OpenStreetMap tiles" background preference to
+    download map tiles; the default "plain black" background performs no
+    network access at all.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Location: mandatory for GPS -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Map view: only used when the OSM tile background preference is selected -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <!-- Background location for recording while screen is off -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
@@ -64,6 +73,13 @@
             android:name=".ui.PreferencesActivity"
             android:exported="false"
             android:label="@string/preferences_title"
+            android:parentActivityName=".ui.MainActivity" />
+
+        <!-- Map screen: planned route, elapsed route, and current location -->
+        <activity
+            android:name=".ui.MapActivity"
+            android:exported="false"
+            android:label="@string/map_title"
             android:parentActivityName=".ui.MainActivity" />
 
         <!-- Foreground service that manages GPS location updates and recording -->

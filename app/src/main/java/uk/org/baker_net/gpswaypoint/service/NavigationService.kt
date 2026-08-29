@@ -477,6 +477,16 @@ class NavigationService : Service() {
     }
 
     /**
+     * Returns a snapshot of the track points recorded so far during the
+     * current (or most recently finished) recording session, for display
+     * as the "elapsed route" on the map screen.
+     *
+     * Input:  none
+     * Output: @return An immutable copy of the current [trackPoints] list.
+     */
+    fun getTrackPoints(): List<TrackPoint> = trackPoints.toList()
+
+    /**
      * Appends a [TrackPoint] to the recording buffer if the device has moved at
      * least [RECORD_MIN_DISTANCE_M] since the last recorded point.
      *

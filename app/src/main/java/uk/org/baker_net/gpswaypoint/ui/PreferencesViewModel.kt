@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import uk.org.baker_net.gpswaypoint.ble.HeartRateManager
 import uk.org.baker_net.gpswaypoint.data.HeartRateMonitorMode
 import uk.org.baker_net.gpswaypoint.data.HeartRateMonitorPreference
+import uk.org.baker_net.gpswaypoint.data.MapBackground
 import uk.org.baker_net.gpswaypoint.data.PreferencesRepository
 import uk.org.baker_net.gpswaypoint.util.GeoUtils
 
@@ -53,6 +54,9 @@ class PreferencesViewModel(application: Application) : AndroidViewModel(applicat
     /** The heart-rate monitor preference as currently saved (read once when the screen opens). */
     val savedHeartRateMonitorPreference: HeartRateMonitorPreference =
         preferencesRepository.getHeartRateMonitorPreference()
+
+    /** The map background style as currently saved (read once when the screen opens). */
+    val savedMapBackground: MapBackground = preferencesRepository.getMapBackground()
 
     init {
         // Make sure a previously-selected specific device is present in the
@@ -116,10 +120,12 @@ class PreferencesViewModel(application: Application) : AndroidViewModel(applicat
      *
      * Input:  @param units Selected [UnitSystem].
      *         @param monitor Selected [HrMonitorOption].
+     *         @param mapBackground Selected [MapBackground].
      * Output: Preferences saved to the database.
      */
-    fun savePreferences(units: GeoUtils.UnitSystem, monitor: HrMonitorOption) {
+    fun savePreferences(units: GeoUtils.UnitSystem, monitor: HrMonitorOption, mapBackground: MapBackground) {
         preferencesRepository.setUnitSystem(units)
+        preferencesRepository.setMapBackground(mapBackground)
         val preference = when (monitor) {
             is HrMonitorOption.Any -> HeartRateMonitorPreference(HeartRateMonitorMode.ANY)
             is HrMonitorOption.None -> HeartRateMonitorPreference(HeartRateMonitorMode.NONE)
