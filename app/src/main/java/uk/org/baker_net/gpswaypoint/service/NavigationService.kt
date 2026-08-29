@@ -197,16 +197,20 @@ class NavigationService : Service() {
     }
 
     fun stopTracking() {
-        stopGps()
-        stopCompass()
-        heartRateManager?.disconnect()
-        lastHeartRate = null
-        waypoints = emptyList()
-        elapsedDistanceM = 0f
-        gpsAccuracy = null
-        isTracking = false
-        handler.removeCallbacks(tickRunnable)
-        leaveForeground()
+	// This can be called while recording by onDestroy in which case
+	// it should do nothing
+        if (!isRecording) {
+            stopGps()
+            stopCompass()
+            heartRateManager?.disconnect()
+            lastHeartRate = null
+            waypoints = emptyList()
+            elapsedDistanceM = 0f
+            gpsAccuracy = null
+            isTracking = false
+            handler.removeCallbacks(tickRunnable)
+            leaveForeground()
+        }
     }
 
     private val tickRunnable = object : Runnable {
@@ -467,13 +471,7 @@ class NavigationService : Service() {
      */
     fun stopRecording(): String {
         isRecording = false
-        if (!isTracking) {
-            stopGps()
-            heartRateManager?.disconnect()
-            lastHeartRate = null
-            gpsAccuracy = null
-            leaveForeground()
-        }
+        stopTracking()
         Log.d(TAG, "Recording stopped, ${trackPoints.size} points")
         return saveTcx()
     }
