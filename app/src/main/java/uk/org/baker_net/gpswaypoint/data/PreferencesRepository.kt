@@ -30,6 +30,18 @@ data class HeartRateMonitorPreference(
 )
 
 /**
+ * The map screen's background style.
+ *
+ *   BLACK – a plain black background; no map tiles are downloaded and no
+ *           network access is performed.
+ *   OSM   – live OpenStreetMap raster tiles are downloaded and displayed.
+ */
+enum class MapBackground {
+    BLACK,
+    OSM
+}
+
+/**
  * PreferencesRepository.kt
  *
  * Typed façade over [PreferencesDbHelper] exposing the app's user
@@ -48,6 +60,7 @@ class PreferencesRepository(context: Context) {
         const val KEY_HR_MODE = "hr_mode"
         const val KEY_HR_DEVICE_ADDRESS = "hr_device_address"
         const val KEY_HR_DEVICE_NAME = "hr_device_name"
+        const val KEY_MAP_BACKGROUND = "map_background"
     }
 
     private val db = PreferencesDbHelper(context)
@@ -112,5 +125,28 @@ class PreferencesRepository(context: Context) {
             db.set(KEY_HR_DEVICE_ADDRESS, null)
             db.set(KEY_HR_DEVICE_NAME, null)
         }
+    }
+
+    /**
+     * Reads the current map background preference.
+     *
+     * Input:  none
+     * Output: @return The saved [MapBackground], or [MapBackground.BLACK] if
+     *         never set, so the map performs no network access by default.
+     */
+    fun getMapBackground(): MapBackground =
+        when (db.get(KEY_MAP_BACKGROUND)) {
+            MapBackground.OSM.name -> MapBackground.OSM
+            else -> MapBackground.BLACK
+        }
+
+    /**
+     * Stores the map background preference.
+     *
+     * Input:  @param background New [MapBackground] to persist.
+     * Output: Preference saved to the database.
+     */
+    fun setMapBackground(background: MapBackground) {
+        db.set(KEY_MAP_BACKGROUND, background.name)
     }
 }

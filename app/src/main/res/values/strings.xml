@@ -24,7 +24,16 @@
     <!-- Menu items -->
     <string name="menu_load_gpx">Load GPX…</string>
     <string name="menu_toggle_record">Toggle Record</string>
+    <string name="menu_map">Map View</string>
     <string name="menu_preferences">Preferences</string>
+
+    <!-- Map screen -->
+    <string name="map_title">Map</string>
+    <string name="map_current_location">Current location</string>
+    <string name="map_zoom_in">Zoom in</string>
+    <string name="map_zoom_out">Zoom out</string>
+    <string name="zoom_in_symbol">+</string>
+    <string name="zoom_out_symbol">−</string>
 
     <!-- Preferences screen -->
     <string name="preferences_title">Preferences</string>
@@ -35,6 +44,9 @@
     <string name="preferences_hr_any">Any</string>
     <string name="preferences_hr_none">None</string>
     <string name="preferences_scanning_hint">Scanning for nearby heart rate monitors…</string>
+    <string name="preferences_map_background_label">Map background</string>
+    <string name="preferences_map_background_black">Plain black</string>
+    <string name="preferences_map_background_osm">OpenStreetMap tiles</string>
     <string name="preferences_save">Save</string>
     <string name="preferences_saved_toast">Preferences saved</string>
     <string name="preferences_bluetooth_permission_missing">Bluetooth permission needed to scan for monitors</string>

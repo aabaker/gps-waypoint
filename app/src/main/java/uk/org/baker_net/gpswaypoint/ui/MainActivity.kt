@@ -172,6 +172,10 @@ class MainActivity : AppCompatActivity() {
                 viewModel.toggleRecording()
                 true
             }
+            R.id.action_map -> {
+                startActivity(Intent(this, MapActivity::class.java))
+                true
+            }
             R.id.action_preferences -> {
                 startActivity(Intent(this, PreferencesActivity::class.java))
                 true

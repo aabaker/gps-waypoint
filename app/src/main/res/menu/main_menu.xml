@@ -18,6 +18,12 @@
         android:title="@string/menu_toggle_record"
         app:showAsAction="never" />
 
+    <!-- Opens the map screen (planned route, elapsed route, current location) -->
+    <item
+        android:id="@+id/action_map"
+        android:title="@string/menu_map"
+        app:showAsAction="never" />
+
     <!-- Opens the preferences screen (units, heart rate monitor selection) -->
     <item
         android:id="@+id/action_preferences"
