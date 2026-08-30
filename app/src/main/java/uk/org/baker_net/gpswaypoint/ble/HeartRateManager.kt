@@ -335,7 +335,7 @@ class HeartRateManager(
          * Parses the BPM value according to the GATT Heart Rate Measurement spec:
          *   bit 0 of flags byte: 0 = UINT8 format, 1 = UINT16 format.
          */
-        @Suppress("DEPRECATION")
+        @Suppress("DEPRECATION","OVERRIDE_DEPRECATION")
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic
