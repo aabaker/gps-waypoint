@@ -96,7 +96,7 @@ Output: `app/build/outputs/apk/debug/app-debug.apk`
 
 ### Locally (Android Studio / command line)
 
-Requirements: JDK 21, Android SDK with build-tools 34, Gradle 8.4.
+Requirements: JDK 21, Android SDK with build-tools 34, Gradle 8.13.
 
 ```bash
 ./gradlew test assembleDebug
