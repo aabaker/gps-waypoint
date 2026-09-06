@@ -298,7 +298,13 @@ class MainActivity : AppCompatActivity() {
                     getString(R.string.start_recording)
             }
             binding.btnTrack.isEnabled      = !state.isRecording
-            binding.tvAccuracy.text = if (state.gpsAccuracy != null) GeoUtils.formatDistance(state.gpsAccuracy, currentUnits) else "--"
+            binding.tvAccuracy.text = when {
+                !state.locationEnabled -> getString(R.string.gps_location_disabled)
+                state.gpsAccuracy != null -> GeoUtils.formatDistance(state.gpsAccuracy, currentUnits)
+                state.satelliteCount != null && state.satelliteCount > 0 ->
+                    getString(R.string.gps_tracking_satellites, state.satelliteCount)
+                else -> "--"
+            }
             binding.tvElapsed.text = if (state.isRecording) GeoUtils.formatDistance(state.elapsedDistanceM, currentUnits) else "--"
             binding.tvHeartRate.text = state.heartRateBpm
                 ?.let { "$it bpm" }

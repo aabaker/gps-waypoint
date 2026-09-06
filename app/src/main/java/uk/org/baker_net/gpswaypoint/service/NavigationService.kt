@@ -1,8 +1,10 @@
 package uk.org.baker_net.gpswaypoint.service
 
 import android.app.*
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -11,6 +13,8 @@ import android.location.*
 import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import androidx.core.location.LocationManagerCompat
 import uk.org.baker_net.gpswaypoint.R
 import uk.org.baker_net.gpswaypoint.ble.HeartRateManager
 import uk.org.baker_net.gpswaypoint.data.HeartRateMonitorMode
@@ -106,6 +110,18 @@ class NavigationService : Service() {
     var gpsAccuracy: Float? = null
         private set
 
+    /** Whether the device's system location setting (GPS) is currently switched on. */
+    var locationEnabled: Boolean = true
+        private set
+
+    /**
+     * Number of GNSS satellites currently being tracked by the chipset, regardless of
+     * whether they currently contribute to a position fix.  Null while location
+     * services are disabled or GPS is not running.
+     */
+    var satelliteCount: Int? = null
+        private set
+
     /** Most recent compass heading in degrees [0, 360). */
     var deviceBearing: Float = 0f
         private set
@@ -163,6 +179,17 @@ class NavigationService : Service() {
     /** Reads the persisted unit system and heart-rate monitor preferences. */
     private lateinit var preferencesRepository: PreferencesRepository
 
+    /**
+     * Notifies when the user toggles the system-wide location setting (e.g. from
+     * Quick Settings or the Settings app) so the UI can react immediately instead
+     * of waiting for the next GPS fix attempt.
+     */
+    private val locationModeReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            refreshLocationEnabled()
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Service lifecycle
     // -------------------------------------------------------------------------
@@ -174,6 +201,15 @@ class NavigationService : Service() {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         preferencesRepository = PreferencesRepository(this)
         createNotificationChannel()
+        refreshLocationEnabled()
+        // This is a system-only broadcast, so RECEIVER_NOT_EXPORTED satisfies the
+        // Android 13+ requirement without allowing other apps to trigger it.
+        ContextCompat.registerReceiver(
+            this,
+            locationModeReceiver,
+            IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -183,6 +219,7 @@ class NavigationService : Service() {
     override fun onDestroy() {
         Log.d(TAG, "Service destroyed")
         stopTracking()
+        unregisterReceiver(locationModeReceiver)
         super.onDestroy()
     }
 
@@ -236,6 +273,9 @@ class NavigationService : Service() {
         if (lastGpsTime < timeSource.markNow() - MAX_DATA_AGE) {
             gpsAccuracy = null
         }
+        // Belt-and-braces: some OEMs are unreliable delivering PROVIDERS_CHANGED_ACTION,
+        // so re-check the system location setting on every tick as well.
+        refreshLocationEnabled()
         onStateChanged?.invoke()
     }
     // -------------------------------------------------------------------------
@@ -271,8 +311,51 @@ class NavigationService : Service() {
             updateNotification()
         }
 
-        override fun onProviderEnabled(provider: String) {}
-        override fun onProviderDisabled(provider: String) {}
+        override fun onProviderEnabled(provider: String) {
+            refreshLocationEnabled()
+        }
+        override fun onProviderDisabled(provider: String) {
+            refreshLocationEnabled()
+        }
+    }
+
+    /**
+     * Reports the number of GNSS satellites currently being tracked by the chipset.
+     * This fires periodically whenever GPS is active, even before a position fix
+     * has been obtained, so it lets the UI show progress ("tracking N satellites")
+     * while waiting for enough satellites to compute a fix.
+     */
+    private val gnssStatusCallback = object : GnssStatus.Callback() {
+        override fun onSatelliteStatusChanged(status: GnssStatus) {
+            satelliteCount = status.satelliteCount
+            onStateChanged?.invoke()
+        }
+
+        override fun onStopped() {
+            satelliteCount = null
+            onStateChanged?.invoke()
+        }
+    }
+
+    /**
+     * Re-reads the system location setting (the user-facing "Location" toggle) and
+     * updates [locationEnabled], notifying observers if it changed.
+     *
+     * Input:  none
+     * Output: [locationEnabled] updated; [onStateChanged] invoked on change.
+     */
+    private fun refreshLocationEnabled() {
+        val enabled = LocationManagerCompat.isLocationEnabled(locationManager)
+        if (enabled != locationEnabled) {
+            locationEnabled = enabled
+            if (!enabled) {
+                // Neither an accuracy figure nor a satellite count are meaningful
+                // once the user has switched location services off.
+                gpsAccuracy = null
+                satelliteCount = null
+            }
+            onStateChanged?.invoke()
+        }
     }
 
     /**
@@ -280,10 +363,11 @@ class NavigationService : Service() {
      * Requires ACCESS_FINE_LOCATION permission – must be granted before calling.
      *
      * Input:  none
-     * Output: GPS callbacks begin arriving on [locationListener].
+     * Output: GPS callbacks begin arriving on [locationListener] and [gnssStatusCallback].
      */
     @Suppress("MissingPermission")
     fun startGps() {
+        refreshLocationEnabled()
         locationManager.requestLocationUpdates(
             LocationManager.GPS_PROVIDER,
             GPS_MIN_TIME_MS,
@@ -291,6 +375,7 @@ class NavigationService : Service() {
             locationListener,
             Looper.getMainLooper()
         )
+        locationManager.registerGnssStatusCallback(gnssStatusCallback, handler)
         Log.d(TAG, "GPS started")
     }
 
@@ -302,6 +387,8 @@ class NavigationService : Service() {
      */
     private fun stopGps() {
         locationManager.removeUpdates(locationListener)
+        locationManager.unregisterGnssStatusCallback(gnssStatusCallback)
+        satelliteCount = null
         Log.d(TAG, "GPS stopped")
     }
 
