@@ -45,6 +45,11 @@ import kotlin.time.TimeSource
  *   2. MainActivity calls [startForeground] when the user grants location permission.
  *   3. On unbind the service continues running (GPS stays alive).
  *   4. [stopSelf] is called when the user explicitly quits or denies permission.
+ *
+ *   Recording and tracking can fail if the OS decides the service is too active and kills
+ *   it (typically when screen is off or app isn't in foreground). Minimise activity
+ *   triggered by this thread to reduce the risk, if that fails add a call to
+ *   ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS.
  */
 class NavigationService : Service() {
 
@@ -327,8 +332,15 @@ class NavigationService : Service() {
      */
     private val gnssStatusCallback = object : GnssStatus.Callback() {
         override fun onSatelliteStatusChanged(status: GnssStatus) {
-            satelliteCount = status.satelliteCount
-            onStateChanged?.invoke()
+            // Only notify observers when the tracked count actually changes rather
+            // than on every ~1 Hz status callback to minimise background
+            // wakeups and reduce risk of battery saver killing us
+            val count = status.satelliteCount
+            if (count != satelliteCount) {
+                satelliteCount = count
+                onStateChanged?.invoke()
+            }
+
         }
 
         override fun onStopped() {
