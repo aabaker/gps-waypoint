@@ -183,6 +183,8 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
             LocationState(
                 isRecording = svc?.isRecording ?: false,
                 gpsAccuracy = svc?.gpsAccuracy,
+                locationEnabled = svc?.locationEnabled ?: true,
+                satelliteCount = svc?.satelliteCount,
                 elapsedDistanceM = svc?.elapsedDistanceM ?: 0f,
                 heartRateBpm = svc?.lastHeartRate
             )
