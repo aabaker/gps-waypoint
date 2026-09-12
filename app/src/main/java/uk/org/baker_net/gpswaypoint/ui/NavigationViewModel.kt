@@ -13,6 +13,7 @@ import uk.org.baker_net.gpswaypoint.service.NavigationService
 import uk.org.baker_net.gpswaypoint.util.GeoUtils
 import uk.org.baker_net.gpswaypoint.util.GpxParser
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.launch
 import uk.org.baker_net.gpswaypoint.model.LocationState
 
@@ -98,8 +99,10 @@ class NavigationViewModel(application: Application) : AndroidViewModel(applicati
                     _toastMessage.postValue("No waypoints found in GPX file")
                     return@launch
                 }
-                service?.startTracking()
-                service?.loadWaypoints(waypoints)
+                withContext(Dispatchers.Main) {
+                    service?.startTracking()
+                    service?.loadWaypoints(waypoints)
+                }
                 _toastMessage.postValue("Loaded ${waypoints.size} waypoints")
             } catch (e: Exception) {
                 _toastMessage.postValue("Failed to parse GPX: ${e.message}")
